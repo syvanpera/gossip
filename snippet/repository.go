@@ -2,6 +2,7 @@ package snippet
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"strings"
 
@@ -82,9 +83,14 @@ FROM snippets WHERE id = $1`, id)
 
 	var s Snippet
 	var tags string
-	if err := row.Scan(&s.ID, &s.Snippet, &s.Description, &tags, &s.Type, &s.Language); err != nil {
+	err := row.Scan(&s.ID, &s.Snippet, &s.Description, &tags, &s.Type, &s.Language)
+	if err == sql.ErrNoRows {
+		fmt.Printf("Snippet with ID %d not found\n", id)
 		return nil
+	} else if err != nil {
+		log.Fatal(err)
 	}
+
 	s.Tags = strings.Split(tags, ",")
 
 	return &s
