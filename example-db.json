@@ -1,0 +1,17 @@
+{
+    "snippets": [
+        {
+            "snippet": "https://github.com/knqyf263/pet",
+            "description": "Simple command-line snippet manager, written in Go. - knqyf263",
+            "tags": ["go", "tools", "cli"],
+            "type": "url"
+        },
+        {
+            "snippet": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Hello, World!\")\n}",
+            "description": "An example in Go",
+            "tags": ["go", "example", "hello"],
+            "type": "code",
+            "language": "go"
+        }
+    ]
+}
