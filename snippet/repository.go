@@ -59,13 +59,18 @@ func (r *Repository) FindAll() []Snippet {
 
 	var ss []Snippet
 	for rows.Next() {
-		var s Snippet
-		var tags sql.NullString
-		if err := rows.Scan(&s.ID, &s.Snippet, &s.Description, &tags, &s.Type, &s.Language); err != nil {
+		var ID int
+		var snippet, description, tags, _type, language sql.NullString
+		if err := rows.Scan(&ID, &snippet, &description, &tags, &_type, &language); err != nil {
 			log.Fatal(err)
 		}
-		if tags.Valid {
-			s.Tags = strings.Split(tags.String, ",")
+		s := Snippet{
+			ID:          ID,
+			Snippet:     snippet.String,
+			Description: description.String,
+			Tags:        strings.Split(tags.String, ","),
+			Type:        _type.String,
+			Language:    language.String,
 		}
 		ss = append(ss, s)
 	}

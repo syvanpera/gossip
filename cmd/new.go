@@ -16,7 +16,7 @@ func new(cmd *cobra.Command, args []string) error {
 	snippets := snippet.NewRepository()
 	snippet := snippet.Snippet{
 		Snippet:     "ls -la",
-		Description: snippet.ToNullString("Lists the contents of a directory"),
+		Description: "Lists the contents of a directory",
 		Type:        "cmd",
 	}
 	snippets.New(&snippet)
