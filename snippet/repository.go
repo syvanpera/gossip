@@ -42,9 +42,18 @@ language TEXT
 }
 
 // New adds a snippet to the DB
-func (r *Repository) New(snippet *Snippet) error {
+func (r *Repository) New(s *Snippet) error {
 	stmt, _ := r.db.Prepare("INSERT INTO snippets (snippet, description, tags, type, language) VALUES (?, ?, ?, ?, ?)")
-	_, err := stmt.Exec(snippet.Snippet, snippet.Description, nil, snippet.Type, nil)
+	_, err := stmt.Exec(s.Snippet, s.Description, nil, s.Type, nil)
+
+	if err == nil {
+		row := r.db.QueryRow("SELECT last_insert_rowid()")
+		var ID int
+		err = row.Scan(&ID)
+		if err == nil {
+			s.ID = ID
+		}
+	}
 
 	return err
 }

@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/spf13/cobra"
@@ -37,12 +38,12 @@ func del(cmd *cobra.Command, args []string) {
 		fmt.Printf("Snippet with ID %d not found\n", id)
 		return
 	}
-	fmt.Println("Got", s)
+	fmt.Printf("Deleting snippet\n%s", s)
 
-	// if err := r.Del(id); err != nil {
-	// 	log.Fatal(err)
-	// }
-	fmt.Println("Snippet removed...")
+	if err := r.Del(id); err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Snippet deleted...")
 }
 
 func init() {

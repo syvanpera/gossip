@@ -33,7 +33,7 @@ func list(cmd *cobra.Command, args []string) {
 	}
 
 	for _, s := range snippets {
-		fmt.Printf("%s\n----------\n", s)
+		fmt.Println(s)
 	}
 }
 

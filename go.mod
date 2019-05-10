@@ -7,6 +7,7 @@ require (
 	github.com/alecthomas/chroma v0.6.3
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/logrusorgru/aurora v0.0.0-20190428105938-cea283e61946
+	github.com/mattn/go-runewidth v0.0.4
 	github.com/mattn/go-sqlite3 v1.10.0
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/viper v1.3.2
