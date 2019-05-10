@@ -31,7 +31,8 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/gossip/config.toml)")
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().BoolP("color", "c", false, "Toggle color output")
+	viper.BindPFlag("color", rootCmd.PersistentFlags().Lookup("color"))
 }
 
 func initConfig() {
