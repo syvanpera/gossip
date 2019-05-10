@@ -11,11 +11,12 @@ var listCmd = &cobra.Command{
 	Use:   "list [type]",
 	Short: "List snippets",
 	Long:  `Lists snippets of given type, or all snippets if no type given`,
-	RunE:  list,
+	Run:   list,
 }
 
-func list(cmd *cobra.Command, args []string) error {
-	fmt.Println("list: ", args)
+var tag string
+
+func list(cmd *cobra.Command, args []string) {
 	// _type := ""
 	// if len(args) > 0 {
 	// _type = args[0]
@@ -23,15 +24,20 @@ func list(cmd *cobra.Command, args []string) error {
 
 	r := snippet.NewRepository()
 	// fmt.Println(r.Get(1))
-	snippets := r.FindAll()
 
-	for _, s := range snippets {
-		fmt.Println(s)
+	var snippets []snippet.Snippet
+	if tag != "" {
+		snippets = r.FindWithTag(tag)
+	} else {
+		snippets = r.FindAll()
 	}
 
-	return nil
+	for _, s := range snippets {
+		fmt.Printf("%s\n----------\n", s)
+	}
 }
 
 func init() {
+	listCmd.Flags().StringVarP(&tag, "tag", "t", "", `Tag filter`)
 	rootCmd.AddCommand(listCmd)
 }

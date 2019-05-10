@@ -18,13 +18,13 @@ var testCmd = &cobra.Command{
 var editCmd = &cobra.Command{
 	Use:   "edit",
 	Short: "Test Edit",
-	RunE:  edit,
+	Run:   edit,
 }
 
 var renderCmd = &cobra.Command{
 	Use:   "render",
 	Short: "Test template rendering",
-	RunE:  render,
+	Run:   render,
 }
 
 var snippetTemplate = `
@@ -35,11 +35,10 @@ Tags: {{range .Tags}}{{.}} {{end}}
 Type: {{.Type}}{{if .Language}}Language: {{.Language}}{{end}}
 `
 
-func test(cmd *cobra.Command, args []string) error {
-	return nil
+func test(cmd *cobra.Command, args []string) {
 }
 
-func edit(cmd *cobra.Command, args []string) error {
+func edit(cmd *cobra.Command, args []string) {
 	fpath := os.TempDir() + "/gossip.tmp"
 	f, err := os.Create(fpath)
 	if err != nil {
@@ -63,11 +62,9 @@ func edit(cmd *cobra.Command, args []string) error {
 	} else {
 		log.Printf("Successfully edited.")
 	}
-
-	return nil
 }
 
-func render(cmd *cobra.Command, args []string) error {
+func render(cmd *cobra.Command, args []string) {
 	snippet := snippet.Snippet{
 		ID:          1,
 		Snippet:     "Test snippet",
@@ -85,8 +82,6 @@ func render(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		panic(err)
 	}
-
-	return nil
 }
 
 func init() {

@@ -49,7 +49,33 @@ func (r *Repository) New(snippet *Snippet) error {
 	return err
 }
 
-// FindAll returns all snipets
+// Get returns a snippet with the given ID
+func (r *Repository) Get(id int) *Snippet {
+	row := r.db.QueryRow(`SELECT id, snippet, description, tags, type, language
+FROM snippets WHERE id = $1`, id)
+
+	var ID int
+	var snippet, description, tags, _type, language sql.NullString
+	err := row.Scan(&ID, &snippet, &description, &tags, &_type, &language)
+	if err == sql.ErrNoRows {
+		return nil
+	} else if err != nil {
+		log.Fatal(err)
+	}
+
+	s := Snippet{
+		ID:          ID,
+		Snippet:     snippet.String,
+		Description: description.String,
+		Tags:        strings.Split(tags.String, ","),
+		Type:        _type.String,
+		Language:    language.String,
+	}
+
+	return &s
+}
+
+// FindAll returns all snippets
 func (r *Repository) FindAll() []Snippet {
 	rows, err := r.db.Query(`SELECT id, snippet, description, tags, type, language FROM snippets`)
 	if err != nil {
@@ -81,22 +107,43 @@ func (r *Repository) FindAll() []Snippet {
 	return ss
 }
 
-// Get returns a snippet with the given ID
-func (r *Repository) Get(id int) *Snippet {
-	row := r.db.QueryRow(`SELECT id, snippet, description, tags, type, language
-FROM snippets WHERE id = $1`, id)
+// FindWithTag returns snippets with given tag
+func (r *Repository) FindWithTag(tag string) []Snippet {
+	rows, err := r.db.Query(`SELECT id, snippet, description, tags, type, language
+FROM snippets
+WHERE tags like $1`, fmt.Sprintf("%%%s%%", tag))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
 
-	var s Snippet
-	var tags string
-	err := row.Scan(&s.ID, &s.Snippet, &s.Description, &tags, &s.Type, &s.Language)
-	if err == sql.ErrNoRows {
-		fmt.Printf("Snippet with ID %d not found\n", id)
-		return nil
-	} else if err != nil {
+	var ss []Snippet
+	for rows.Next() {
+		var ID int
+		var snippet, description, tags, _type, language sql.NullString
+		if err := rows.Scan(&ID, &snippet, &description, &tags, &_type, &language); err != nil {
+			log.Fatal(err)
+		}
+		s := Snippet{
+			ID:          ID,
+			Snippet:     snippet.String,
+			Description: description.String,
+			Tags:        strings.Split(tags.String, ","),
+			Type:        _type.String,
+			Language:    language.String,
+		}
+		ss = append(ss, s)
+	}
+	if err = rows.Err(); err != nil {
 		log.Fatal(err)
 	}
 
-	s.Tags = strings.Split(tags, ",")
+	return ss
+}
 
-	return &s
+// Del removes a snippet with the given ID
+func (r *Repository) Del(id int) error {
+	_, err := r.db.Exec("DELETE FROM snippets WHERE id = $1", id)
+
+	return err
 }
