@@ -8,29 +8,31 @@ import (
 )
 
 var listCmd = &cobra.Command{
-	Use:   "list [type]",
-	Short: "List snippets",
-	Long:  `Lists snippets of given type, or all snippets if no type given`,
-	Run:   list,
+	Use:       "list [type]",
+	Short:     "List snippets",
+	Long:      `Lists snippets of given type, or all snippets if no type given`,
+	Args:      cobra.ExactValidArgs(1),
+	ValidArgs: []string{"cmd", "code", "url"},
+	Run:       list,
 }
 
-var tag string
+var tag, language string
 
 func list(cmd *cobra.Command, args []string) {
-	// _type := ""
-	// if len(args) > 0 {
-	// _type = args[0]
-	// }
+	filters := snippet.Filters{Language: language}
+	if tag != "" {
+		filters.Tags = []string{tag}
+	}
+	if len(args) > 0 {
+		filters.Type = args[0]
+	}
+
+	fmt.Println(filters)
 
 	r := snippet.NewRepository()
-	// fmt.Println(r.Get(1))
 
 	var snippets []snippet.Snippet
-	if tag != "" {
-		snippets = r.FindWithTag(tag)
-	} else {
-		snippets = r.FindAll()
-	}
+	snippets = r.FindWithFilters(filters)
 
 	for _, s := range snippets {
 		fmt.Println(s)
@@ -39,5 +41,6 @@ func list(cmd *cobra.Command, args []string) {
 
 func init() {
 	listCmd.Flags().StringVarP(&tag, "tag", "t", "", `Tag filter`)
+	listCmd.Flags().StringVarP(&language, "language", "l", "", `Language filter`)
 	rootCmd.AddCommand(listCmd)
 }

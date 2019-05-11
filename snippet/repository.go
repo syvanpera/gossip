@@ -116,6 +116,54 @@ func (r *Repository) FindAll() []Snippet {
 	return ss
 }
 
+// FindWithFilters returns snippets that match the given filters
+func (r *Repository) FindWithFilters(filters Filters) []Snippet {
+	var wheres []string
+	fmt.Println(wheres)
+	if filters.Type != "" {
+		wheres = append(wheres, fmt.Sprintf("type = \"%s\"", filters.Type))
+	}
+	if filters.Language != "" {
+		wheres = append(wheres, fmt.Sprintf("language = \"%s\"", filters.Language))
+	}
+
+	var qb strings.Builder
+	qb.WriteString("SELECT id, snippet, description, tags, type, language FROM snippets")
+	if len(wheres) > 0 {
+		fmt.Fprintf(&qb, " WHERE %s", strings.Join(wheres, " AND "))
+	}
+	fmt.Println(qb.String())
+
+	rows, err := r.db.Query(qb.String())
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	var ss []Snippet
+	for rows.Next() {
+		var ID int
+		var snippet, description, tags, _type, language sql.NullString
+		if err := rows.Scan(&ID, &snippet, &description, &tags, &_type, &language); err != nil {
+			log.Fatal(err)
+		}
+		s := Snippet{
+			ID:          ID,
+			Snippet:     snippet.String,
+			Description: description.String,
+			Tags:        strings.Split(tags.String, ","),
+			Type:        _type.String,
+			Language:    language.String,
+		}
+		ss = append(ss, s)
+	}
+	if err = rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	return ss
+}
+
 // FindWithTag returns snippets with given tag
 func (r *Repository) FindWithTag(tag string) []Snippet {
 	rows, err := r.db.Query(`SELECT id, snippet, description, tags, type, language
