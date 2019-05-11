@@ -127,14 +127,14 @@ func (r *Repository) FindWithFilters(filters Filters) []Snippet {
 		wheres = append(wheres, fmt.Sprintf("language = \"%s\"", filters.Language))
 	}
 
-	var qb strings.Builder
-	qb.WriteString("SELECT id, snippet, description, tags, type, language FROM snippets")
+	var sb strings.Builder
+	sb.WriteString("SELECT id, snippet, description, tags, type, language FROM snippets")
 	if len(wheres) > 0 {
-		fmt.Fprintf(&qb, " WHERE %s", strings.Join(wheres, " AND "))
+		fmt.Fprintf(&sb, " WHERE %s", strings.Join(wheres, " AND "))
 	}
-	fmt.Println(qb.String())
+	fmt.Println(sb.String())
 
-	rows, err := r.db.Query(qb.String())
+	rows, err := r.db.Query(sb.String())
 	if err != nil {
 		log.Fatal(err)
 	}
