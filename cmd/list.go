@@ -11,9 +11,14 @@ var listCmd = &cobra.Command{
 	Use:       "list [type]",
 	Short:     "List snippets",
 	Long:      `Lists snippets of given type, or all snippets if no type given`,
-	Args:      cobra.ExactValidArgs(1),
 	ValidArgs: []string{"cmd", "code", "url"},
-	Run:       list,
+	Args: func(cmd *cobra.Command, args []string) error {
+		if err := cobra.MaximumNArgs(1)(cmd, args); err != nil {
+			return err
+		}
+		return cobra.OnlyValidArgs(cmd, args)
+	},
+	Run: list,
 }
 
 var tag, language string
@@ -27,12 +32,8 @@ func list(cmd *cobra.Command, args []string) {
 		filters.Type = args[0]
 	}
 
-	fmt.Println(filters)
-
 	r := snippet.NewRepository()
-
-	var snippets []snippet.Snippet
-	snippets = r.FindWithFilters(filters)
+	snippets := r.FindWithFilters(filters)
 
 	for _, s := range snippets {
 		fmt.Println(s)
