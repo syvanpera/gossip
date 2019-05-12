@@ -3,9 +3,9 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"log"
 	"strconv"
 
+	"github.com/Songmu/prompter"
 	"github.com/spf13/cobra"
 	"github.com/syvanpera/gossip/snippet"
 )
@@ -35,13 +35,18 @@ func del(cmd *cobra.Command, args []string) {
 
 	s := r.Get(id)
 	if s == nil {
-		fmt.Printf("Snippet with ID %d not found\n", id)
+		fmt.Printf("Snippet #%d not found\n", id)
 		return
 	}
-	fmt.Printf("Deleting snippet\n%s", s)
+	fmt.Print(s)
+	if !prompter.YN("Are you sure you want to delete this snippet?", false) {
+		return
+	}
 
 	if err := r.Del(id); err != nil {
-		log.Fatal(err)
+		fmt.Printf("unable to delete snippet #%d\n", id)
+		fmt.Println(err)
+		return
 	}
 	fmt.Println("Snippet deleted...")
 }

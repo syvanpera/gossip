@@ -3,6 +3,7 @@ module github.com/syvanpera/gossip
 go 1.12
 
 require (
+	github.com/Songmu/prompter v0.2.0
 	github.com/alecthomas/chroma v0.6.3
 	github.com/chzyer/logex v1.1.10 // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e
