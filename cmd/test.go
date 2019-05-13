@@ -12,28 +12,30 @@ import (
 	"github.com/syvanpera/gossip/snippet"
 )
 
-var testCmd = &cobra.Command{
-	Use:   "test",
-	Short: "Testing",
-}
+var (
+	testCmd = &cobra.Command{
+		Use:   "test",
+		Short: "Testing",
+	}
 
-var editCmd = &cobra.Command{
-	Use:   "edit",
-	Short: "Test Edit",
-	Run:   edit,
-}
+	editCmd = &cobra.Command{
+		Use:   "edit",
+		Short: "Test Edit",
+		Run:   edit,
+	}
 
-var renderCmd = &cobra.Command{
-	Use:   "render",
-	Short: "Test template rendering",
-	Run:   render,
-}
+	renderCmd = &cobra.Command{
+		Use:   "render",
+		Short: "Test template rendering",
+		Run:   render,
+	}
 
-var pipeCmd = &cobra.Command{
-	Use:   "pipe",
-	Short: "Read from pipe",
-	Run:   pipe,
-}
+	pipeCmd = &cobra.Command{
+		Use:   "pipe",
+		Short: "Read from pipe",
+		Run:   pipe,
+	}
+)
 
 var snippetTemplate = `
 ID: {{.ID}}

@@ -21,7 +21,9 @@ var listCmd = &cobra.Command{
 	Run: list,
 }
 
-var tag, language string
+var (
+	tag, language string
+)
 
 func list(cmd *cobra.Command, args []string) {
 	filters := snippet.Filters{Language: language}
