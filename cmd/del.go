@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/Songmu/prompter"
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"github.com/syvanpera/gossip/snippet"
 )
@@ -39,15 +39,24 @@ func del(cmd *cobra.Command, args []string) {
 		return
 	}
 	fmt.Print(s)
-	if !prompter.YN("Are you sure you want to delete this snippet?", false) {
+	// if !prompter.YN("Are you sure you want to delete this snippet?", false) {
+	// 	return
+	// }
+	prompt := promptui.Prompt{
+		Label:     "Are you sure you want to delete this snippet",
+		IsConfirm: true,
+	}
+
+	if _, err := prompt.Run(); err != nil {
 		return
 	}
 
-	if err := r.Del(id); err != nil {
-		fmt.Printf("unable to delete snippet #%d\n", id)
-		fmt.Println(err)
-		return
-	}
+	// if err := r.Del(id); err != nil {
+	// 	fmt.Printf("unable to delete snippet #%d\n", id)
+	// 	fmt.Println(err)
+	// 	return
+	// }
+
 	fmt.Println("Snippet deleted...")
 }
 
