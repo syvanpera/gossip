@@ -88,7 +88,7 @@ var style = styles.Register(chroma.MustNewStyle("gruvbox", chroma.StyleEntries{
 }))
 
 func renderCode(s Snippet) string {
-	colors := viper.GetBool("colorOutput") != viper.GetBool("color")
+	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
 	au := aurora.NewAurora(colors)
 	var output strings.Builder
 	width, _ := GetTerminalSize()
@@ -120,7 +120,7 @@ func renderCode(s Snippet) string {
 }
 
 func render(s Snippet) string {
-	colors := viper.GetBool("colorOutput") != viper.GetBool("color")
+	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
 	au := aurora.NewAurora(colors)
 	var output strings.Builder
 	width, _ := GetTerminalSize()

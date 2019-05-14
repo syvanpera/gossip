@@ -6,8 +6,13 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"sort"
+	"strings"
 	"text/template"
 
+	"github.com/alecthomas/chroma/formatters"
+	"github.com/alecthomas/chroma/lexers"
+	"github.com/alecthomas/chroma/styles"
 	"github.com/spf13/cobra"
 	"github.com/syvanpera/gossip/snippet"
 )
@@ -34,6 +39,12 @@ var (
 		Use:   "pipe",
 		Short: "Read from pipe",
 		Run:   pipe,
+	}
+
+	languagesCmd = &cobra.Command{
+		Use:   "languages",
+		Short: "List supported languages",
+		Run:   languages,
 	}
 )
 
@@ -129,9 +140,43 @@ func pipe(cmd *cobra.Command, args []string) {
 	// 	fmt.Printf("%c", output[j])
 	// }
 }
+
+func languages(cmd *cobra.Command, args []string) {
+	fmt.Println("lexers:")
+	sort.Sort(lexers.Registry.Lexers)
+	for _, l := range lexers.Registry.Lexers {
+		config := l.Config()
+		fmt.Printf("  %s\n", config.Name)
+		filenames := []string{}
+		filenames = append(filenames, config.Filenames...)
+		filenames = append(filenames, config.AliasFilenames...)
+		if len(config.Aliases) > 0 {
+			fmt.Printf("    aliases: %s\n", strings.Join(config.Aliases, " "))
+		}
+		if len(filenames) > 0 {
+			fmt.Printf("    filenames: %s\n", strings.Join(filenames, " "))
+		}
+		if len(config.MimeTypes) > 0 {
+			fmt.Printf("    mimetypes: %s\n", strings.Join(config.MimeTypes, " "))
+		}
+	}
+	fmt.Println()
+	fmt.Printf("styles:")
+	for _, name := range styles.Names() {
+		fmt.Printf(" %s", name)
+	}
+	fmt.Println()
+	fmt.Printf("formatters:")
+	for _, name := range formatters.Names() {
+		fmt.Printf(" %s", name)
+	}
+	fmt.Println()
+}
+
 func init() {
 	testCmd.AddCommand(editCmd)
 	testCmd.AddCommand(renderCmd)
 	testCmd.AddCommand(pipeCmd)
+	testCmd.AddCommand(languagesCmd)
 	rootCmd.AddCommand(testCmd)
 }

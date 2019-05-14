@@ -36,14 +36,16 @@ func init() {
 }
 
 func initConfig() {
-	viper.SetDefault("database", "example-db.json")
-
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
 	} else {
 		viper.SetConfigName("config")
 		viper.AddConfigPath("$HOME/.config/gossip")
 	}
+
+	viper.SetDefault("database", "example-db.json")
+	viper.SetDefault("defaults.color", true)
+	viper.SetDefault("types", []string{"code", "cmd", "url", "snippet"})
 
 	viper.AutomaticEnv()
 	viper.ReadInConfig()
