@@ -31,7 +31,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/gossip/config.toml)")
-	rootCmd.PersistentFlags().BoolP("color", "c", false, "Toggle color output")
+	rootCmd.PersistentFlags().BoolP("color", "c", false, "toggle color output")
 	viper.BindPFlag("color", rootCmd.PersistentFlags().Lookup("color"))
 }
 
@@ -43,9 +43,9 @@ func initConfig() {
 		viper.AddConfigPath("$HOME/.config/gossip")
 	}
 
-	viper.SetDefault("database", "example-db.json")
+	viper.SetDefault("database", "gossip.db")
 	viper.SetDefault("defaults.color", true)
-	viper.SetDefault("types", []string{"code", "cmd", "url", "snippet"})
+	viper.SetDefault("defaults.browser", "default")
 
 	viper.AutomaticEnv()
 	viper.ReadInConfig()

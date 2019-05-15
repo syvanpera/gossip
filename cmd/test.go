@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -13,9 +15,15 @@ import (
 	"github.com/alecthomas/chroma/formatters"
 	"github.com/alecthomas/chroma/lexers"
 	"github.com/alecthomas/chroma/styles"
+	"github.com/chzyer/readline"
+	"github.com/logrusorgru/aurora"
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/syvanpera/gossip/snippet"
 )
+
+var testErrCanceled = errors.New("Input canceled")
 
 var (
 	testCmd = &cobra.Command{
@@ -23,28 +31,36 @@ var (
 		Short: "Testing",
 	}
 
-	editCmd = &cobra.Command{
+	testEditCmd = &cobra.Command{
 		Use:   "edit",
 		Short: "Test Edit",
-		Run:   edit,
+		Run:   testEdit,
 	}
 
-	renderCmd = &cobra.Command{
+	testRenderCmd = &cobra.Command{
 		Use:   "render",
 		Short: "Test template rendering",
-		Run:   render,
+		Run:   testRender,
 	}
 
-	pipeCmd = &cobra.Command{
+	testPipeCmd = &cobra.Command{
 		Use:   "pipe",
 		Short: "Read from pipe",
-		Run:   pipe,
+		Run:   testPipe,
 	}
 
-	languagesCmd = &cobra.Command{
+	testLanguagesCmd = &cobra.Command{
 		Use:   "languages",
 		Short: "List supported languages",
-		Run:   languages,
+		Run:   testLanguages,
+	}
+
+	testAddCmd = &cobra.Command{
+		Use:     "add [type]",
+		Aliases: []string{"new"},
+		Short:   "Add new snippet",
+		Long:    `Add new snippet of type "type"`,
+		Run:     testAdd,
 	}
 )
 
@@ -59,7 +75,7 @@ Type: {{.Type}}{{if .Language}}Language: {{.Language}}{{end}}
 func test(cmd *cobra.Command, args []string) {
 }
 
-func edit(cmd *cobra.Command, args []string) {
+func testEdit(cmd *cobra.Command, args []string) {
 	fpath := os.TempDir() + "/gossip.tmp"
 	f, err := os.Create(fpath)
 	if err != nil {
@@ -90,10 +106,10 @@ func edit(cmd *cobra.Command, args []string) {
 	fmt.Println(string(data))
 }
 
-func render(cmd *cobra.Command, args []string) {
+func testRender(cmd *cobra.Command, args []string) {
 	snippet := snippet.SnippetData{
 		ID:          1,
-		Snippet:     "Test snippet",
+		Content:     "Test snippet",
 		Description: "Test description",
 		Tags:        []string{"tag1", "tag2"},
 		Type:        "code",
@@ -110,7 +126,7 @@ func render(cmd *cobra.Command, args []string) {
 	}
 }
 
-func pipe(cmd *cobra.Command, args []string) {
+func testPipe(cmd *cobra.Command, args []string) {
 	// info, err := os.Stdin.Stat()
 	// if err != nil {
 	// 	panic(err)
@@ -141,7 +157,7 @@ func pipe(cmd *cobra.Command, args []string) {
 	// }
 }
 
-func languages(cmd *cobra.Command, args []string) {
+func testLanguages(cmd *cobra.Command, args []string) {
 	fmt.Println("lexers:")
 	sort.Sort(lexers.Registry.Lexers)
 	for _, l := range lexers.Registry.Lexers {
@@ -173,10 +189,95 @@ func languages(cmd *cobra.Command, args []string) {
 	fmt.Println()
 }
 
+func testAdd(cmd *cobra.Command, args []string) {
+	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
+	au := aurora.NewAurora(colors)
+	// s, err := testScan(au.Yellow("Snippet> ").String())
+	// if err == testErrCanceled {
+	// 	return
+	// }
+	// fmt.Println(s, err)
+	description, err := testScan(au.Cyan("Description> ").String())
+	if err == testErrCanceled {
+		return
+	}
+	fmt.Println(description)
+
+	items := []string{"Go", "Javascript", "Elm", "Typescript"}
+	index := -1
+	var result string
+
+	for index < 0 {
+		prompt := promptui.SelectWithAdd{
+			Label:    "Language",
+			Items:    items,
+			AddLabel: "Other",
+		}
+
+		index, result, err = prompt.Run()
+
+		if index == -1 {
+			items = append(items, result)
+		}
+	}
+
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return
+	}
+
+	fmt.Printf("You chose %s\n", result)
+	// snippets := snippet.NewRepository()
+	// newSnippet := snippet.Snippet{
+	// 	Snippet:     "ls -la",
+	// 	Description: "Lists the contents of a directory",
+	// 	Type:        "cmd",
+	// }
+	// snippets.New(&newSnippet)
+	// fmt.Printf("Added new snippet\n%s", newSnippet)
+}
+
+func testScan(message string) (string, error) {
+	tempFile := os.TempDir() + "/gossip.history"
+	l, err := readline.NewEx(&readline.Config{
+		Prompt:          message,
+		HistoryFile:     tempFile,
+		InterruptPrompt: "^C",
+		EOFPrompt:       "exit",
+
+		HistorySearchFold: true,
+	})
+	if err != nil {
+		return "", err
+	}
+	defer l.Close()
+
+	for {
+		line, err := l.Readline()
+		if err == readline.ErrInterrupt {
+			if len(line) == 0 {
+				break
+			} else {
+				continue
+			}
+		} else if err == io.EOF {
+			break
+		}
+
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		return line, nil
+	}
+	return "", testErrCanceled
+}
+
 func init() {
-	testCmd.AddCommand(editCmd)
-	testCmd.AddCommand(renderCmd)
-	testCmd.AddCommand(pipeCmd)
-	testCmd.AddCommand(languagesCmd)
+	testCmd.AddCommand(testEditCmd)
+	testCmd.AddCommand(testRenderCmd)
+	testCmd.AddCommand(testPipeCmd)
+	testCmd.AddCommand(testLanguagesCmd)
+	testCmd.AddCommand(testAddCmd)
 	rootCmd.AddCommand(testCmd)
 }

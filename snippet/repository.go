@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/spf13/viper"
+	"github.com/syvanpera/gossip/util"
 
 	// bring in the sqlite3 driver
 	_ "github.com/mattn/go-sqlite3"
@@ -23,12 +24,12 @@ func NewRepository() *Repository {
 }
 
 func openDB(file string) *sql.DB {
-	EnsureDir(file)
+	util.EnsureDir(file)
 	db, _ := sql.Open("sqlite3", file)
 	stmt, _ := db.Prepare(`
 		CREATE TABLE IF NOT EXISTS snippets (
 			id INTEGER PRIMARY KEY,
-			snippet TEXT,
+			content TEXT,
 			description TEXT,
 			tags TEXT,
 			type TEXT,
@@ -42,12 +43,31 @@ func openDB(file string) *sql.DB {
 	return db
 }
 
+func (r *Repository) Upsert(s Snippet) error {
+	sd := s.Data()
+	stmt, _ := r.db.Prepare(`
+		INSERT INTO snippets (content, description, tags, type, language)
+		VALUES (?, ?, ?, ?, ?)`)
+	_, err := stmt.Exec(sd.Content, sd.Description, strings.Join(sd.Tags, ","), sd.Type, sd.Language)
+
+	if err == nil {
+		row := r.db.QueryRow("SELECT last_insert_rowid()")
+		var ID int
+		err = row.Scan(&ID)
+		if err == nil {
+			sd.ID = ID
+		}
+	}
+
+	return err
+}
+
 // New adds a snippet to the DB
 func (r *Repository) New(s *SnippetData) error {
 	stmt, _ := r.db.Prepare(`
-		INSERT INTO snippets (snippet, description, tags, type, language)
+		INSERT INTO snippets (content, description, tags, type, language)
 		VALUES (?, ?, ?, ?, ?)`)
-	_, err := stmt.Exec(s.Snippet, s.Description, nil, s.Type, nil)
+	_, err := stmt.Exec(s.Content, s.Description, s.Tags, s.Type, s.Language)
 
 	if err == nil {
 		row := r.db.QueryRow("SELECT last_insert_rowid()")
@@ -64,12 +84,12 @@ func (r *Repository) New(s *SnippetData) error {
 // Get returns a snippet with the given ID
 func (r *Repository) Get(id int) Snippet {
 	var ID int
-	var snippet, description, tags, _type, language sql.NullString
+	var content, description, tags, _type, language sql.NullString
 
 	row := r.db.QueryRow(`
-		SELECT id, snippet, description, tags, type, language
+		SELECT id, content, description, tags, type, language
 		FROM snippets WHERE id = $1`, id)
-	err := row.Scan(&ID, &snippet, &description, &tags, &_type, &language)
+	err := row.Scan(&ID, &content, &description, &tags, &_type, &language)
 	if err == sql.ErrNoRows {
 		return nil
 	} else if err != nil {
@@ -78,7 +98,7 @@ func (r *Repository) Get(id int) Snippet {
 
 	sd := SnippetData{
 		ID:          ID,
-		Snippet:     snippet.String,
+		Content:     content.String,
 		Description: description.String,
 		Tags:        strings.Split(tags.String, ","),
 		Type:        SnippetType(_type.String),
@@ -91,7 +111,7 @@ func (r *Repository) Get(id int) Snippet {
 // FindAll returns all snippets
 func (r *Repository) FindAll() []Snippet {
 	rows, err := r.db.Query(`
-		SELECT id, snippet, description, tags, type, language
+		SELECT id, content, description, tags, type, language
 		FROM snippets`)
 	if err != nil {
 		log.Fatal(err)
@@ -101,13 +121,13 @@ func (r *Repository) FindAll() []Snippet {
 	var ss []Snippet
 	for rows.Next() {
 		var ID int
-		var snippet, description, tags, _type, language sql.NullString
-		if err := rows.Scan(&ID, &snippet, &description, &tags, &_type, &language); err != nil {
+		var content, description, tags, _type, language sql.NullString
+		if err := rows.Scan(&ID, &content, &description, &tags, &_type, &language); err != nil {
 			log.Fatal(err)
 		}
 		s := SnippetData{
 			ID:          ID,
-			Snippet:     snippet.String,
+			Content:     content.String,
 			Description: description.String,
 			Tags:        strings.Split(tags.String, ","),
 			Type:        SnippetType(_type.String),
@@ -134,7 +154,7 @@ func (r *Repository) FindWithFilters(filters Filters) []Snippet {
 	}
 
 	var sb strings.Builder
-	sb.WriteString("SELECT id, snippet, description, tags, type, language FROM snippets")
+	sb.WriteString("SELECT id, content, description, tags, type, language FROM snippets")
 	if len(wheres) > 0 {
 		fmt.Fprintf(&sb, " WHERE %s", strings.Join(wheres, " AND "))
 	}
@@ -149,13 +169,13 @@ func (r *Repository) FindWithFilters(filters Filters) []Snippet {
 	var ss []Snippet
 	for rows.Next() {
 		var ID int
-		var snippet, description, tags, _type, language sql.NullString
-		if err := rows.Scan(&ID, &snippet, &description, &tags, &_type, &language); err != nil {
+		var content, description, tags, _type, language sql.NullString
+		if err := rows.Scan(&ID, &content, &description, &tags, &_type, &language); err != nil {
 			log.Fatal(err)
 		}
 		s := SnippetData{
 			ID:          ID,
-			Snippet:     snippet.String,
+			Content:     content.String,
 			Description: description.String,
 			Tags:        strings.Split(tags.String, ","),
 			Type:        SnippetType(_type.String),
@@ -172,7 +192,7 @@ func (r *Repository) FindWithFilters(filters Filters) []Snippet {
 
 // FindWithTag returns snippets with given tag
 func (r *Repository) FindWithTag(tag string) []Snippet {
-	rows, err := r.db.Query(`SELECT id, snippet, description, tags, type, language
+	rows, err := r.db.Query(`SELECT id, content, description, tags, type, language
 FROM snippets
 WHERE tags like $1`, fmt.Sprintf("%%%s%%", tag))
 	if err != nil {
@@ -183,13 +203,13 @@ WHERE tags like $1`, fmt.Sprintf("%%%s%%", tag))
 	var ss []Snippet
 	for rows.Next() {
 		var ID int
-		var snippet, description, tags, _type, language sql.NullString
-		if err := rows.Scan(&ID, &snippet, &description, &tags, &_type, &language); err != nil {
+		var content, description, tags, _type, language sql.NullString
+		if err := rows.Scan(&ID, &content, &description, &tags, &_type, &language); err != nil {
 			log.Fatal(err)
 		}
 		s := SnippetData{
 			ID:          ID,
-			Snippet:     snippet.String,
+			Content:     content.String,
 			Description: description.String,
 			Tags:        strings.Split(tags.String, ","),
 			Type:        SnippetType(_type.String),

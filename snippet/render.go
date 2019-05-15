@@ -11,6 +11,7 @@ import (
 	"github.com/logrusorgru/aurora"
 	"github.com/mattn/go-runewidth"
 	"github.com/spf13/viper"
+	"github.com/syvanpera/gossip/util"
 )
 
 var style = styles.Register(chroma.MustNewStyle("gruvbox", chroma.StyleEntries{
@@ -92,30 +93,30 @@ func renderCode(s SnippetData) string {
 	au := aurora.NewAurora(colors)
 
 	var output strings.Builder
-	width, _ := GetTerminalSize()
+	width, _ := util.GetTerminalSize()
 	description := runewidth.Truncate(s.Description, width-10, au.Gray(8, "...").String())
 	border := strings.Repeat("─", width)
 	borderVert := au.Gray(8, "│")
 
-	fmt.Fprintln(&output, au.Gray(8, ReplaceRuneAtIndex(border, '┬', 8)))
+	fmt.Fprintln(&output, au.Gray(8, util.ReplaceRuneAtIndex(border, '┬', 8)))
 	fmt.Fprintf(&output, "%s%s %s\n",
-		au.Cyan(CenterStr(fmt.Sprintf("#%d", s.ID), 8)),
+		au.Cyan(util.CenterStr(fmt.Sprintf("#%d", s.ID), 8)),
 		borderVert,
 		au.Yellow(description))
-	fmt.Fprintln(&output, au.Gray(8, ReplaceRuneAtIndex(border, '┼', 8)))
+	fmt.Fprintln(&output, au.Gray(8, util.ReplaceRuneAtIndex(border, '┼', 8)))
 
-	snippet := s.Snippet
+	content := s.Content
 	if colors {
 		var sb strings.Builder
-		quick.Highlight(&sb, s.Snippet, s.Language, "terminal16m", "gruvbox")
-		snippet = sb.String()
+		quick.Highlight(&sb, s.Content, s.Language, "terminal16m", "gruvbox")
+		content = sb.String()
 	}
 
-	for i, s := range strings.Split(snippet, "\n") {
-		fmt.Fprintf(&output, "%s", au.Gray(8, CenterStr(strconv.Itoa(i+1), 8)))
+	for i, s := range strings.Split(content, "\n") {
+		fmt.Fprintf(&output, "%s", au.Gray(8, util.CenterStr(strconv.Itoa(i+1), 8)))
 		fmt.Fprintf(&output, "%s %s\n", borderVert, s)
 	}
-	fmt.Fprintln(&output, au.Gray(8, ReplaceRuneAtIndex(border, '┴', 8)))
+	fmt.Fprintln(&output, au.Gray(8, util.ReplaceRuneAtIndex(border, '┴', 8)))
 
 	return output.String()
 }
@@ -128,7 +129,7 @@ func renderBookmark(s SnippetData) string {
 
 	fmt.Fprintf(&output, "\n%s ", au.BrightCyan(fmt.Sprintf("%d.", s.ID)))
 	fmt.Fprintln(&output, au.Bold(au.BrightGreen(s.Description)))
-	fmt.Fprintf(&output, "   %s %s\n", au.BrightRed(">"), au.BrightYellow(s.Snippet))
+	fmt.Fprintf(&output, "   %s %s\n", au.BrightRed(">"), au.BrightYellow(s.Content))
 	fmt.Fprintf(&output, "   %s %s", au.BrightRed("#"), au.BrightBlue(strings.Join(s.Tags, ",")))
 
 	return output.String()
@@ -139,23 +140,23 @@ func render(s SnippetData) string {
 	au := aurora.NewAurora(colors)
 
 	var output strings.Builder
-	width, _ := GetTerminalSize()
+	width, _ := util.GetTerminalSize()
 	description := runewidth.Truncate(s.Description, width-10, au.Gray(8, "...").String())
 	border := strings.Repeat("─", width)
 	borderVert := au.Gray(8, "│")
 
-	fmt.Fprintln(&output, au.Gray(8, ReplaceRuneAtIndex(border, '┬', 8)))
+	fmt.Fprintln(&output, au.Gray(8, util.ReplaceRuneAtIndex(border, '┬', 8)))
 	fmt.Fprintf(&output, "%s%s %s\n",
-		au.Cyan(CenterStr(fmt.Sprintf("#%d", s.ID), 8)),
+		au.Cyan(util.CenterStr(fmt.Sprintf("#%d", s.ID), 8)),
 		borderVert,
 		au.Yellow(description))
-	fmt.Fprintln(&output, au.Gray(8, ReplaceRuneAtIndex(border, '┼', 8)))
+	fmt.Fprintln(&output, au.Gray(8, util.ReplaceRuneAtIndex(border, '┼', 8)))
 
-	for i, s := range strings.Split(s.Snippet, "\n") {
-		fmt.Fprintf(&output, "%s", au.Gray(8, CenterStr(strconv.Itoa(i+1), 8)))
+	for i, s := range strings.Split(s.Content, "\n") {
+		fmt.Fprintf(&output, "%s", au.Gray(8, util.CenterStr(strconv.Itoa(i+1), 8)))
 		fmt.Fprintf(&output, "%s %s\n", borderVert, s)
 	}
-	fmt.Fprintln(&output, au.Gray(8, ReplaceRuneAtIndex(border, '┴', 8)))
+	fmt.Fprintln(&output, au.Gray(8, util.ReplaceRuneAtIndex(border, '┴', 8)))
 
 	return output.String()
 }

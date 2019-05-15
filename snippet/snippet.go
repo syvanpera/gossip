@@ -21,9 +21,9 @@ var ErrNotExecutable = errors.New("Not executable")
 // SnippetData contains the data for one snippet
 type SnippetData struct {
 	ID          int         `json:"id"`
-	Snippet     string      `json:"snippet"`
+	Content     string      `json:"content"`
 	Description string      `json:"description"`
-	Tags        []string    `json:"tags"`
+	Tags        []string    `json:"tags,omitempty"`
 	Type        SnippetType `json:"type"`
 	Language    string      `json:"language,omitempty"`
 }
@@ -32,25 +32,28 @@ type SnippetType string
 
 type Snippet interface {
 	Type() SnippetType
+	Data() *SnippetData
 	Execute() error
 	String() string
 }
 
 type Code struct {
-	Data SnippetData
+	data SnippetData
 }
 
-func (c *Code) Type() SnippetType { return CODE }
-func (c *Code) Execute() error    { return ErrNotExecutable }
+func (c *Code) Type() SnippetType  { return CODE }
+func (c *Code) Data() *SnippetData { return &c.data }
+func (c *Code) Execute() error     { return ErrNotExecutable }
 func (c *Code) String() string {
-	return renderCode(c.Data)
+	return renderCode(c.data)
 }
 
 type Command struct {
-	Data SnippetData
+	data SnippetData
 }
 
-func (cmd *Command) Type() SnippetType { return COMMAND }
+func (cmd *Command) Type() SnippetType  { return COMMAND }
+func (cmd *Command) Data() *SnippetData { return &cmd.data }
 
 func (cmd *Command) Execute() error {
 	fmt.Println("Okay, executing command...")
@@ -58,19 +61,20 @@ func (cmd *Command) Execute() error {
 }
 
 func (cmd *Command) String() string {
-	return render(cmd.Data)
+	return render(cmd.data)
 }
 
 type Bookmark struct {
-	Data SnippetData
+	data SnippetData
 }
 
-func (b *Bookmark) Type() SnippetType { return BOOKMARK }
+func (b *Bookmark) Type() SnippetType  { return BOOKMARK }
+func (b *Bookmark) Data() *SnippetData { return &b.data }
 
 func (b *Bookmark) Execute() error {
 	fmt.Println("Okay, opening link in default browser...")
-	url := b.Data.Snippet
-	if matched, _ := regexp.MatchString(`^http(s)?://*`, url); !matched {
+	url := b.data.Content
+	if matched, _ := regexp.MatchString("^http(s)?://*", url); !matched {
 		url = "http://" + url
 	}
 	browser.OpenURL(url)
@@ -79,18 +83,17 @@ func (b *Bookmark) Execute() error {
 }
 
 func (b *Bookmark) String() string {
-	return renderBookmark(b.Data)
+	return renderBookmark(b.data)
 }
 
 type Snip struct {
-	Data SnippetData
+	data SnippetData
 }
 
-func (s *Snip) Type() SnippetType { return SNIP }
-func (s *Snip) Execute() error    { return ErrNotExecutable }
-func (s *Snip) String() string {
-	return render(s.Data)
-}
+func (s *Snip) Type() SnippetType  { return SNIP }
+func (s *Snip) Data() *SnippetData { return &s.data }
+func (s *Snip) Execute() error     { return ErrNotExecutable }
+func (s *Snip) String() string     { return render(s.data) }
 
 // Filters are used to filter the snippets list
 type Filters struct {
@@ -103,18 +106,31 @@ func (f Filters) String() string {
 	return fmt.Sprintf("{Type: \"%s\", Language: \"%s\", Tags: \"%s\"}", f.Type, f.Language, strings.Join(f.Tags, ","))
 }
 
+func NewBookmark(url, description, tags string) *Bookmark {
+	bookmark := Bookmark{
+		data: SnippetData{
+			Content:     url,
+			Description: description,
+			Tags:        strings.Split(tags, ","),
+			Type:        BOOKMARK,
+		},
+	}
+
+	return &bookmark
+}
+
 func New(sd SnippetData) Snippet {
 	switch sd.Type {
 	case COMMAND:
-		return &Command{Data: sd}
+		return &Command{data: sd}
 
 	case CODE:
-		return &Code{Data: sd}
+		return &Code{data: sd}
 
 	case BOOKMARK:
-		return &Bookmark{Data: sd}
+		return &Bookmark{data: sd}
 
 	default:
-		return &Snip{Data: sd}
+		return &Snip{data: sd}
 	}
 }

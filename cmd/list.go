@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/syvanpera/gossip/snippet"
 )
 
@@ -12,10 +11,6 @@ var listCmd = &cobra.Command{
 	Use:   "list [type]",
 	Short: "List snippets",
 	Long:  `Lists snippets of given type, or all snippets if no type given`,
-	PreRun: func(cmd *cobra.Command, args []string) {
-		fmt.Println("1")
-		cmd.ValidArgs = viper.GetStringSlice("types")
-	},
 	Args: func(cmd *cobra.Command, args []string) error {
 		if err := cobra.MaximumNArgs(1)(cmd, args); err != nil {
 			return err
