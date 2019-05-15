@@ -87,9 +87,10 @@ var style = styles.Register(chroma.MustNewStyle("gruvbox", chroma.StyleEntries{
 	chroma.TextWhitespace:           "#fdf4c1",
 }))
 
-func renderCode(s Snippet) string {
+func renderCode(s SnippetData) string {
 	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
 	au := aurora.NewAurora(colors)
+
 	var output strings.Builder
 	width, _ := GetTerminalSize()
 	description := runewidth.Truncate(s.Description, width-10, au.Gray(8, "...").String())
@@ -119,9 +120,24 @@ func renderCode(s Snippet) string {
 	return output.String()
 }
 
-func render(s Snippet) string {
+func renderBookmark(s SnippetData) string {
 	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
 	au := aurora.NewAurora(colors)
+
+	var output strings.Builder
+
+	fmt.Fprintf(&output, "\n%s ", au.BrightCyan(fmt.Sprintf("%d.", s.ID)))
+	fmt.Fprintln(&output, au.Bold(au.BrightGreen(s.Description)))
+	fmt.Fprintf(&output, "   %s %s\n", au.BrightRed(">"), au.BrightYellow(s.Snippet))
+	fmt.Fprintf(&output, "   %s %s", au.BrightRed("#"), au.BrightBlue(strings.Join(s.Tags, ",")))
+
+	return output.String()
+}
+
+func render(s SnippetData) string {
+	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
+	au := aurora.NewAurora(colors)
+
 	var output strings.Builder
 	width, _ := GetTerminalSize()
 	description := runewidth.Truncate(s.Description, width-10, au.Gray(8, "...").String())

@@ -43,7 +43,7 @@ func openDB(file string) *sql.DB {
 }
 
 // New adds a snippet to the DB
-func (r *Repository) New(s *Snippet) error {
+func (r *Repository) New(s *SnippetData) error {
 	stmt, _ := r.db.Prepare(`
 		INSERT INTO snippets (snippet, description, tags, type, language)
 		VALUES (?, ?, ?, ?, ?)`)
@@ -62,7 +62,7 @@ func (r *Repository) New(s *Snippet) error {
 }
 
 // Get returns a snippet with the given ID
-func (r *Repository) Get(id int) *Snippet {
+func (r *Repository) Get(id int) Snippet {
 	var ID int
 	var snippet, description, tags, _type, language sql.NullString
 
@@ -76,16 +76,16 @@ func (r *Repository) Get(id int) *Snippet {
 		log.Fatal(err)
 	}
 
-	s := Snippet{
+	sd := SnippetData{
 		ID:          ID,
 		Snippet:     snippet.String,
 		Description: description.String,
 		Tags:        strings.Split(tags.String, ","),
-		Type:        _type.String,
+		Type:        SnippetType(_type.String),
 		Language:    language.String,
 	}
 
-	return &s
+	return New(sd)
 }
 
 // FindAll returns all snippets
@@ -105,15 +105,15 @@ func (r *Repository) FindAll() []Snippet {
 		if err := rows.Scan(&ID, &snippet, &description, &tags, &_type, &language); err != nil {
 			log.Fatal(err)
 		}
-		s := Snippet{
+		s := SnippetData{
 			ID:          ID,
 			Snippet:     snippet.String,
 			Description: description.String,
 			Tags:        strings.Split(tags.String, ","),
-			Type:        _type.String,
+			Type:        SnippetType(_type.String),
 			Language:    language.String,
 		}
-		ss = append(ss, s)
+		ss = append(ss, New(s))
 	}
 	if err = rows.Err(); err != nil {
 		log.Fatal(err)
@@ -153,15 +153,15 @@ func (r *Repository) FindWithFilters(filters Filters) []Snippet {
 		if err := rows.Scan(&ID, &snippet, &description, &tags, &_type, &language); err != nil {
 			log.Fatal(err)
 		}
-		s := Snippet{
+		s := SnippetData{
 			ID:          ID,
 			Snippet:     snippet.String,
 			Description: description.String,
 			Tags:        strings.Split(tags.String, ","),
-			Type:        _type.String,
+			Type:        SnippetType(_type.String),
 			Language:    language.String,
 		}
-		ss = append(ss, s)
+		ss = append(ss, New(s))
 	}
 	if err = rows.Err(); err != nil {
 		log.Fatal(err)
@@ -187,15 +187,15 @@ WHERE tags like $1`, fmt.Sprintf("%%%s%%", tag))
 		if err := rows.Scan(&ID, &snippet, &description, &tags, &_type, &language); err != nil {
 			log.Fatal(err)
 		}
-		s := Snippet{
+		s := SnippetData{
 			ID:          ID,
 			Snippet:     snippet.String,
 			Description: description.String,
 			Tags:        strings.Split(tags.String, ","),
-			Type:        _type.String,
+			Type:        SnippetType(_type.String),
 			Language:    language.String,
 		}
-		ss = append(ss, s)
+		ss = append(ss, New(s))
 	}
 	if err = rows.Err(); err != nil {
 		log.Fatal(err)

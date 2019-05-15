@@ -91,7 +91,7 @@ func edit(cmd *cobra.Command, args []string) {
 }
 
 func render(cmd *cobra.Command, args []string) {
-	snippet := snippet.Snippet{
+	snippet := snippet.SnippetData{
 		ID:          1,
 		Snippet:     "Test snippet",
 		Description: "Test description",
