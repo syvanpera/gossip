@@ -13,6 +13,7 @@ const (
 )
 
 var ErrNotExecutable = errors.New("Not executable")
+var ErrExecCanceled = errors.New("Execution canceled")
 
 // SnippetData contains the data for one snippet
 type SnippetData struct {
@@ -42,22 +43,6 @@ func (c *Code) Data() *SnippetData { return &c.data }
 func (c *Code) Execute() error     { return ErrNotExecutable }
 func (c *Code) String() string {
 	return renderCode(c.data)
-}
-
-type Command struct {
-	data SnippetData
-}
-
-func (cmd *Command) Type() SnippetType  { return COMMAND }
-func (cmd *Command) Data() *SnippetData { return &cmd.data }
-
-func (cmd *Command) Execute() error {
-	fmt.Println("Okay, executing command...")
-	return nil
-}
-
-func (cmd *Command) String() string {
-	return render(cmd.data)
 }
 
 type Snip struct {

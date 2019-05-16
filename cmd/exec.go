@@ -37,20 +37,6 @@ func execute(cmd *cobra.Command, args []string) {
 	}
 
 	s.Execute()
-
-	// if s.Type != "cmd" {
-	// 	fmt.Printf("can't execute snippet #%d, it's not a command snippet\n", s.ID)
-	// 	return
-	// }
-	// fmt.Printf("Running snippet \"%s\"...\n", s.Snippet)
-
-	// var command *exec.Cmd
-	// command = exec.Command("sh", "-c", s.Snippet)
-	// command.Stderr = os.Stderr
-	// command.Stdout = os.Stdout
-	// command.Stdin = os.Stdin
-
-	// command.Run()
 }
 
 func init() {

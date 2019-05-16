@@ -21,11 +21,11 @@ var (
 	}
 
 	addCommandCmd = &cobra.Command{
-		Use:     "cmd COMMAND",
+		Use:     "cmd",
 		Aliases: []string{"command"},
 		Short:   "Add new command snippet",
 		Long:    `Add new command snippet`,
-		Args:    cobra.MinimumNArgs(1),
+		Args:    cobra.NoArgs,
 		Run:     addCommand,
 	}
 
@@ -47,16 +47,31 @@ var (
 	}
 )
 
-func addCommand(cmd *cobra.Command, args []string) {
-	command := args[0]
-	fmt.Printf("addCommand: %v\n", command)
+func addCommand(_ *cobra.Command, _ []string) {
+	tags := tagsFlag
+	command := ""
+	if command = promptFor("Command"); command == "" {
+		fmt.Println("Canceled")
+		return
+	}
+
+	description := ""
+	if description = promptFor("Description"); description == "" {
+		fmt.Println("Canceled")
+		return
+	}
+
+	cmd := snippet.NewCommand(command, description, tags)
+	snippet.NewRepository().Add(cmd)
+
+	fmt.Printf("Command added\n%s", cmd.String())
 }
 
-func addCode(cmd *cobra.Command, args []string) {
+func addCode(_ *cobra.Command, args []string) {
 	fmt.Printf("addCode: %v", args)
 }
 
-func addBookmark(cmd *cobra.Command, args []string) {
+func addBookmark(_ *cobra.Command, args []string) {
 	url := ""
 	if len(args) > 0 {
 		url = args[0]

@@ -9,9 +9,10 @@ import (
 )
 
 var listCmd = &cobra.Command{
-	Use:   "list [type]",
-	Short: "List snippets",
-	Long:  `Lists snippets of given type, or all snippets if no type given`,
+	Use:     "list [type]",
+	Aliases: []string{"ls"},
+	Short:   "List snippets",
+	Long:    `Lists snippets of given type, or all snippets if no type given`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if err := cobra.MaximumNArgs(1)(cmd, args); err != nil {
 			return err
