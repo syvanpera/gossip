@@ -10,7 +10,8 @@ import (
 	"strings"
 )
 
-var ErrMetaExtraction = errors.New("can't extract metadata")
+var ErrMetaExtraction = errors.New("errors while extracting metadata")
+var ErrMetaNotSupported = errors.New("can't handle this")
 
 var extractors []Extractor
 
@@ -20,13 +21,10 @@ type MetaData struct {
 }
 
 type Extractor interface {
-	CanHandle(url string) bool
 	Extract(url string) (*MetaData, error)
 }
 
 type Generic struct{}
-
-func (Generic) CanHandle(url string) bool { return true }
 
 func (Generic) Extract(url string) (*MetaData, error) {
 	fmt.Printf("Fetching metadata from %s... ", url)
@@ -58,13 +56,11 @@ func (Generic) Extract(url string) (*MetaData, error) {
 
 func Extract(url string) *MetaData {
 	for _, e := range extractors {
-		if e.CanHandle(url) {
-			meta, err := e.Extract(url)
-			if err != nil {
-				continue
-			}
-			return meta
+		meta, err := e.Extract(url)
+		if err != nil {
+			continue
 		}
+		return meta
 	}
 
 	return nil

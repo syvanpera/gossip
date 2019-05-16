@@ -12,12 +12,11 @@ import (
 
 type Github struct{}
 
-func (Github) CanHandle(url string) bool {
-	matched, _ := regexp.MatchString("^https?://github.com*", url)
-	return matched
-}
-
 func (Github) Extract(url string) (*MetaData, error) {
+	if matched, _ := regexp.MatchString("^https?://github.com*", url); !matched {
+		return nil, ErrMetaNotSupported
+	}
+
 	fmt.Print("Fetching metadata from github... ")
 
 	re := regexp.MustCompile("^https?://github.com/([^/]*)/([^/]*)")
