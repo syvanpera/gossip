@@ -134,6 +134,11 @@ func (r *Repository) FindWithFilters(filters Filters) []Snippet {
 	if filters.Language != "" {
 		wheres = append(wheres, fmt.Sprintf("language = \"%s\"", filters.Language))
 	}
+	if len(filters.Tags) > 0 {
+		for _, tag := range filters.Tags {
+			wheres = append(wheres, fmt.Sprintf("',' || tags || ',' like '%%,%s,%%'", tag))
+		}
+	}
 
 	var sb strings.Builder
 	sb.WriteString("SELECT id, content, description, tags, type, language FROM snippets")

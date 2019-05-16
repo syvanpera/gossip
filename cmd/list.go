@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/syvanpera/gossip/snippet"
@@ -20,15 +21,15 @@ var listCmd = &cobra.Command{
 	Run: list,
 }
 
-var tag, language string
+var tags, language string
 
 func list(cmd *cobra.Command, args []string) {
 	filters := snippet.Filters{Language: language}
-	if tag != "" {
-		filters.Tags = []string{tag}
+	if tags != "" {
+		filters.Tags = strings.Split(tags, ",")
 	}
 	if len(args) > 0 {
-		filters.Type = args[0]
+		filters.Type = strings.ToUpper(args[0])
 	}
 
 	r := snippet.NewRepository()
@@ -40,7 +41,7 @@ func list(cmd *cobra.Command, args []string) {
 }
 
 func init() {
-	listCmd.Flags().StringVarP(&tag, "tag", "t", "", `Tag filter`)
-	listCmd.Flags().StringVarP(&language, "language", "l", "", `Language filter`)
+	listCmd.Flags().StringVarP(&tags, "tags", "t", "", "Tags filter (comma separated)")
+	listCmd.Flags().StringVarP(&language, "language", "l", "", "Language filter")
 	rootCmd.AddCommand(listCmd)
 }
