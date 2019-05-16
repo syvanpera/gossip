@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"github.com/syvanpera/gossip/meta"
 	"github.com/syvanpera/gossip/snippet"
@@ -20,8 +21,8 @@ var (
 	}
 
 	addCommandCmd = &cobra.Command{
-		Use:     "command SNIPPET",
-		Aliases: []string{"cmd"},
+		Use:     "cmd COMMAND",
+		Aliases: []string{"command"},
 		Short:   "Add new command snippet",
 		Long:    `Add new command snippet`,
 		Args:    cobra.MinimumNArgs(1),
@@ -29,7 +30,7 @@ var (
 	}
 
 	addCodeCmd = &cobra.Command{
-		Use:   "code SNIPPET",
+		Use:   "code CODE",
 		Short: "Add new code snippet",
 		Long:  `Add new code snippet`,
 		Args:  cobra.MinimumNArgs(1),
@@ -37,17 +38,18 @@ var (
 	}
 
 	addBookmarkCmd = &cobra.Command{
-		Use:     "bookmark SNIPPET",
-		Aliases: []string{"bm"},
+		Use:     "bm SNIPPET",
+		Aliases: []string{"bookmark", "url"},
 		Short:   "Add new bookmark",
 		Long:    `Add new bookmark`,
-		Args:    cobra.MinimumNArgs(1),
-		Run:     addBookmark,
+		// Args:    cobra.MinimumNArgs(1),
+		Run: addBookmark,
 	}
 )
 
 func addCommand(cmd *cobra.Command, args []string) {
-	fmt.Printf("addCommand: %v", args)
+	command := args[0]
+	fmt.Printf("addCommand: %v\n", command)
 }
 
 func addCode(cmd *cobra.Command, args []string) {
@@ -55,7 +57,19 @@ func addCode(cmd *cobra.Command, args []string) {
 }
 
 func addBookmark(cmd *cobra.Command, args []string) {
-	url := args[0]
+	url := ""
+	if len(args) > 0 {
+		url = args[0]
+	}
+
+	if url == "" {
+		url = promptFor("Url")
+		if url == "" {
+			fmt.Println("Canceled")
+			return
+		}
+	}
+
 	if matched, _ := regexp.MatchString("^https?://*", url); !matched {
 		url = "http://" + url
 	}
@@ -81,7 +95,23 @@ func addBookmark(cmd *cobra.Command, args []string) {
 	bookmark := snippet.NewBookmark(url, description, tags)
 	snippet.NewRepository().Add(bookmark)
 
-	fmt.Printf("New bookmark added\n%s", bookmark.String())
+	fmt.Printf("Bookmark added\n%s", bookmark.String())
+}
+
+func promptFor(lable string) string {
+	prompt := promptui.Prompt{
+		Label: "URL",
+	}
+
+	input, err := prompt.Run()
+	if err != nil {
+		return ""
+	}
+	if input == "" {
+		return ""
+	}
+
+	return input
 }
 
 func init() {
