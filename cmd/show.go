@@ -10,9 +10,10 @@ import (
 )
 
 var showCmd = &cobra.Command{
-	Use:   "show",
-	Short: "Show a snippet",
-	Long:  `Show a snippet`,
+	Use:     "show",
+	Aliases: []string{"get"},
+	Short:   "Show a snippet",
+	Long:    `Show a snippet`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
 			return errors.New("requires an integer ID argument")

@@ -15,7 +15,7 @@ var extractors []Extractor
 
 type MetaData struct {
 	Description string
-	Tags        []string
+	Tags        string
 }
 
 type Extractor interface {

@@ -37,15 +37,14 @@ func (b *Bookmark) String() string {
 	fmt.Fprintf(&output, "\n%s ", au.BrightCyan(fmt.Sprintf("%d.", b.data.ID)))
 	fmt.Fprintln(&output, au.Bold(au.BrightGreen(b.data.Description)))
 	fmt.Fprintf(&output, "   %s %s\n", au.BrightRed(">"), au.BrightYellow(b.data.Content))
-	tags := strings.Join(b.data.Tags, ",")
-	if tags != "" {
-		fmt.Fprintf(&output, "   %s %s\n", au.BrightRed("#"), au.BrightBlue(tags))
+	if b.data.Tags != "" {
+		fmt.Fprintf(&output, "   %s %s\n", au.BrightRed("#"), au.BrightBlue(b.data.Tags))
 	}
 
 	return output.String()
 }
 
-func NewBookmark(url, description string, tags []string) *Bookmark {
+func NewBookmark(url, description string, tags string) *Bookmark {
 	bookmark := Bookmark{
 		data: SnippetData{
 			Content:     url,

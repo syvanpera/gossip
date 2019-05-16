@@ -7,6 +7,7 @@ require (
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-github/v25 v25.0.4
+	github.com/jmoiron/sqlx v1.2.0
 	github.com/logrusorgru/aurora v0.0.0-20190428105938-cea283e61946
 	github.com/manifoldco/promptui v0.3.2
 	github.com/mattn/go-isatty v0.0.7 // indirect

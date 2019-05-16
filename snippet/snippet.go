@@ -3,7 +3,6 @@ package snippet
 import (
 	"errors"
 	"fmt"
-	"strings"
 )
 
 const (
@@ -17,12 +16,12 @@ var ErrNotExecutable = errors.New("Not executable")
 
 // SnippetData contains the data for one snippet
 type SnippetData struct {
-	ID          int         `json:"id"`
-	Content     string      `json:"content"`
-	Description string      `json:"description"`
-	Tags        []string    `json:"tags,omitempty"`
-	Type        SnippetType `json:"type"`
-	Language    string      `json:"language,omitempty"`
+	ID          int64
+	Content     string
+	Description string
+	Tags        string
+	Type        SnippetType
+	Language    string
 }
 
 type SnippetType string
@@ -74,11 +73,11 @@ func (s *Snip) String() string     { return render(s.data) }
 type Filters struct {
 	Type     string
 	Language string
-	Tags     []string
+	Tags     string
 }
 
 func (f Filters) String() string {
-	return fmt.Sprintf("{Type: \"%s\", Language: \"%s\", Tags: \"%s\"}", f.Type, f.Language, strings.Join(f.Tags, ","))
+	return fmt.Sprintf("{Type: \"%s\", Language: \"%s\", Tags: \"%s\"}", f.Type, f.Language, f.Tags)
 }
 
 func New(sd SnippetData) Snippet {

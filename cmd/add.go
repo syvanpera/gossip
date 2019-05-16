@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"regexp"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/syvanpera/gossip/meta"
@@ -66,23 +65,21 @@ func addBookmark(cmd *cobra.Command, args []string) {
 		description = args[1]
 	}
 
-	var tags []string
-	if tagsFlag != "" {
-		tags = strings.Split(tagsFlag, ",")
-	}
+	tags := tagsFlag
 
-	if description == "" || len(tags) == 0 {
+	if description == "" || tags == "" {
 		if meta := meta.Extract(url); meta != nil {
-			description = meta.Description
-			tags = append(tags, meta.Tags...)
+			if description == "" {
+				description = meta.Description
+			}
+			if tags == "" {
+				tags = meta.Tags
+			}
 		}
 	}
 
 	bookmark := snippet.NewBookmark(url, description, tags)
-	if err := snippet.NewRepository().Add(bookmark); err != nil {
-		fmt.Println(err)
-		return
-	}
+	snippet.NewRepository().Add(bookmark)
 
 	fmt.Printf("New bookmark added\n%s", bookmark.String())
 }

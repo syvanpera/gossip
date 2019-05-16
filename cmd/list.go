@@ -26,7 +26,7 @@ var tags, language string
 func list(cmd *cobra.Command, args []string) {
 	filters := snippet.Filters{Language: language}
 	if tags != "" {
-		filters.Tags = strings.Split(tags, ",")
+		filters.Tags = tags
 	}
 	if len(args) > 0 {
 		filters.Type = strings.ToUpper(args[0])

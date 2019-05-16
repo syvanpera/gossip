@@ -111,7 +111,7 @@ func testRender(cmd *cobra.Command, args []string) {
 		ID:          1,
 		Content:     "Test snippet",
 		Description: "Test description",
-		Tags:        []string{"tag1", "tag2"},
+		Tags:        "tag1,tag2",
 		Type:        "code",
 		Language:    "go",
 	}

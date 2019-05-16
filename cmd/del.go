@@ -38,10 +38,9 @@ func del(cmd *cobra.Command, args []string) {
 		fmt.Printf("Snippet #%d not found\n", id)
 		return
 	}
+
 	fmt.Print(s)
-	// if !prompter.YN("Are you sure you want to delete this snippet?", false) {
-	// 	return
-	// }
+
 	prompt := promptui.Prompt{
 		Label:     "Are you sure you want to delete this snippet",
 		IsConfirm: true,
@@ -51,11 +50,7 @@ func del(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	// if err := r.Del(id); err != nil {
-	// 	fmt.Printf("unable to delete snippet #%d\n", id)
-	// 	fmt.Println(err)
-	// 	return
-	// }
+	r.Del(id)
 
 	fmt.Println("Snippet deleted...")
 }
