@@ -3,9 +3,7 @@ package util
 import (
 	"database/sql"
 	"fmt"
-	"io/ioutil"
 	"math"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -77,28 +75,4 @@ func StrPad(input string, padLength int, padString string, padType string) strin
 	}
 
 	return output
-}
-
-func ExtractTitleFromURL(url string) string {
-	response, err := http.Get(url)
-	if err != nil {
-		return ""
-	}
-	defer response.Body.Close()
-
-	dataInBytes, err := ioutil.ReadAll(response.Body)
-	pageContent := string(dataInBytes)
-
-	titleStartIndex := strings.Index(pageContent, "<title>")
-	if titleStartIndex == -1 {
-		return ""
-	}
-	titleStartIndex += 7
-
-	titleEndIndex := strings.Index(pageContent, "</title>")
-	if titleEndIndex == -1 {
-		return ""
-	}
-
-	return pageContent[titleStartIndex:titleEndIndex]
 }

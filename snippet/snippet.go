@@ -3,10 +3,7 @@ package snippet
 import (
 	"errors"
 	"fmt"
-	"regexp"
 	"strings"
-
-	"github.com/pkg/browser"
 )
 
 const (
@@ -64,28 +61,6 @@ func (cmd *Command) String() string {
 	return render(cmd.data)
 }
 
-type Bookmark struct {
-	data SnippetData
-}
-
-func (b *Bookmark) Type() SnippetType  { return BOOKMARK }
-func (b *Bookmark) Data() *SnippetData { return &b.data }
-
-func (b *Bookmark) Execute() error {
-	fmt.Println("Okay, opening link in default browser...")
-	url := b.data.Content
-	if matched, _ := regexp.MatchString("^http(s)?://*", url); !matched {
-		url = "http://" + url
-	}
-	browser.OpenURL(url)
-
-	return nil
-}
-
-func (b *Bookmark) String() string {
-	return renderBookmark(b.data)
-}
-
 type Snip struct {
 	data SnippetData
 }
@@ -104,19 +79,6 @@ type Filters struct {
 
 func (f Filters) String() string {
 	return fmt.Sprintf("{Type: \"%s\", Language: \"%s\", Tags: \"%s\"}", f.Type, f.Language, strings.Join(f.Tags, ","))
-}
-
-func NewBookmark(url, description, tags string) *Bookmark {
-	bookmark := Bookmark{
-		data: SnippetData{
-			Content:     url,
-			Description: description,
-			Tags:        strings.Split(tags, ","),
-			Type:        BOOKMARK,
-		},
-	}
-
-	return &bookmark
 }
 
 func New(sd SnippetData) Snippet {

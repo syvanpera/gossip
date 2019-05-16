@@ -43,6 +43,7 @@ func openDB(file string) *sql.DB {
 	return db
 }
 
+// Upsert either inserts a new snippet or updates an existing one
 func (r *Repository) Upsert(s Snippet) error {
 	sd := s.Data()
 	stmt, _ := r.db.Prepare(`
@@ -56,25 +57,6 @@ func (r *Repository) Upsert(s Snippet) error {
 		err = row.Scan(&ID)
 		if err == nil {
 			sd.ID = ID
-		}
-	}
-
-	return err
-}
-
-// New adds a snippet to the DB
-func (r *Repository) New(s *SnippetData) error {
-	stmt, _ := r.db.Prepare(`
-		INSERT INTO snippets (content, description, tags, type, language)
-		VALUES (?, ?, ?, ?, ?)`)
-	_, err := stmt.Exec(s.Content, s.Description, s.Tags, s.Type, s.Language)
-
-	if err == nil {
-		row := r.db.QueryRow("SELECT last_insert_rowid()")
-		var ID int
-		err = row.Scan(&ID)
-		if err == nil {
-			s.ID = ID
 		}
 	}
 

@@ -2,14 +2,15 @@ package cmd
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/syvanpera/gossip/meta"
 	"github.com/syvanpera/gossip/snippet"
-	"github.com/syvanpera/gossip/util"
 )
 
-var tags string
+var tagsFlag string
 
 var (
 	addCmd = &cobra.Command{
@@ -55,24 +56,35 @@ func addCode(cmd *cobra.Command, args []string) {
 }
 
 func addBookmark(cmd *cobra.Command, args []string) {
-	fmt.Printf("addBookmark: %v %v\n", args, tags)
-	fmt.Printf("tags: %v\n", strings.Split(tags, ","))
-
 	url := args[0]
-	description := util.ExtractTitleFromURL(url)
-	fmt.Println("Got title [" + description + "]")
+	if matched, _ := regexp.MatchString("^https?://*", url); !matched {
+		url = "http://" + url
+	}
+
+	description := ""
+	if len(args) > 1 {
+		description = args[1]
+	}
+
+	var tags []string
+	if tagsFlag != "" {
+		tags = strings.Split(tagsFlag, ",")
+	}
+
+	if description == "" || len(tags) == 0 {
+		if meta, err := meta.Extract(url); err == nil {
+			description = meta.Description
+			tags = append(tags, meta.Tags...)
+		}
+	}
 
 	bookmark := snippet.NewBookmark(url, description, tags)
-	snippets := snippet.NewRepository()
-	snippets.Upsert(bookmark)
-	// bookmark := snippet.SnippetData{
-	// 	Content:     url,
-	// 	Description: description,
-	// 	Type:        "BOOKMARK",
-	// 	Tags:        strings.Split(tags, ","),
-	// }
-	// snippets.New(&bookmark)
-	fmt.Printf("Added new bookmark\n%s", bookmark.String())
+	if err := snippet.NewRepository().Upsert(bookmark); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf("New bookmark (ID: %d) added\n%s", bookmark.Data().ID, bookmark.String())
 }
 
 func init() {
@@ -81,5 +93,5 @@ func init() {
 	addCmd.AddCommand(addBookmarkCmd)
 	rootCmd.AddCommand(addCmd)
 
-	addCmd.PersistentFlags().StringVarP(&tags, "tags", "t", "", "tags")
+	addCmd.PersistentFlags().StringVarP(&tagsFlag, "tags", "t", "", "tags")
 }

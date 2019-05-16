@@ -121,20 +121,6 @@ func renderCode(s SnippetData) string {
 	return output.String()
 }
 
-func renderBookmark(s SnippetData) string {
-	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
-	au := aurora.NewAurora(colors)
-
-	var output strings.Builder
-
-	fmt.Fprintf(&output, "\n%s ", au.BrightCyan(fmt.Sprintf("%d.", s.ID)))
-	fmt.Fprintln(&output, au.Bold(au.BrightGreen(s.Description)))
-	fmt.Fprintf(&output, "   %s %s\n", au.BrightRed(">"), au.BrightYellow(s.Content))
-	fmt.Fprintf(&output, "   %s %s", au.BrightRed("#"), au.BrightBlue(strings.Join(s.Tags, ",")))
-
-	return output.String()
-}
-
 func render(s SnippetData) string {
 	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
 	au := aurora.NewAurora(colors)
