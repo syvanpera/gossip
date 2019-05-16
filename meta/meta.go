@@ -29,9 +29,10 @@ type Generic struct{}
 func (Generic) CanHandle(url string) bool { return true }
 
 func (Generic) Extract(url string) (*MetaData, error) {
-	fmt.Printf("Fetching description from %s\n", url)
+	fmt.Printf("Fetching metadata from %s... ", url)
 	response, err := http.Get(url)
 	if err != nil {
+		fmt.Println("Failed")
 		return nil, err
 	}
 	defer response.Body.Close()
@@ -42,6 +43,7 @@ func (Generic) Extract(url string) (*MetaData, error) {
 	re := regexp.MustCompile("<title>(.*)</title>")
 	result := re.FindStringSubmatch(content)
 	if result == nil || len(result) < 2 {
+		fmt.Println("Failed")
 		return nil, errors.New("can't find <title> tag")
 	}
 	description := strings.TrimSpace(html.UnescapeString(result[1]))
@@ -50,13 +52,17 @@ func (Generic) Extract(url string) (*MetaData, error) {
 		Description: description,
 	}
 
+	fmt.Println("Done")
 	return &meta, nil
 }
 
 func Extract(url string) *MetaData {
 	for _, e := range extractors {
 		if e.CanHandle(url) {
-			meta, _ := e.Extract(url)
+			meta, err := e.Extract(url)
+			if err != nil {
+				continue
+			}
 			return meta
 		}
 	}

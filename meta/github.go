@@ -18,15 +18,17 @@ func (Github) CanHandle(url string) bool {
 }
 
 func (Github) Extract(url string) (*MetaData, error) {
-	fmt.Println("Extracting metadata from github")
+	fmt.Print("Fetching metadata from github... ")
 
 	re := regexp.MustCompile("^https?://github.com/([^/]*)/([^/]*)")
 	result := re.FindStringSubmatch(url)
 	if result == nil {
+		fmt.Println("Failed")
 		return nil, ErrMetaExtraction
 	}
 
 	if len(result) < 3 {
+		fmt.Println("Failed")
 		return nil, ErrMetaExtraction
 	}
 
@@ -37,6 +39,7 @@ func (Github) Extract(url string) (*MetaData, error) {
 
 	repos, _, err := client.Repositories.Get(context.Background(), user, repo)
 	if err != nil {
+		fmt.Println("Failed")
 		return nil, ErrMetaExtraction
 	}
 
@@ -45,5 +48,6 @@ func (Github) Extract(url string) (*MetaData, error) {
 		Tags:        fmt.Sprintf("%s,%s", "github", strings.ToLower(html.UnescapeString(*repos.Language))),
 	}
 
+	fmt.Println("Done")
 	return &meta, nil
 }
