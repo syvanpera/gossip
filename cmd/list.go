@@ -2,35 +2,60 @@ package cmd
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/syvanpera/gossip/snippet"
 )
 
-var listCmd = &cobra.Command{
-	Use:     "list [type]",
-	Aliases: []string{"ls"},
-	Short:   "List snippets",
-	Long:    `Lists snippets of given type, or all snippets if no type given`,
-	Args: func(cmd *cobra.Command, args []string) error {
-		if err := cobra.MaximumNArgs(1)(cmd, args); err != nil {
-			return err
-		}
-		return cobra.OnlyValidArgs(cmd, args)
-	},
-	Run: list,
-}
+var (
+	listCmd = &cobra.Command{
+		Use:     "list",
+		Aliases: []string{"ls"},
+		Short:   "List snippets",
+		Long:    `List snippets`,
+	}
+
+	listCommandCmd = &cobra.Command{
+		Use:     "cmd",
+		Aliases: []string{"command"},
+		Short:   "List command snippets",
+		Long:    `List command snippets`,
+		Args:    cobra.NoArgs,
+		Run: func(_ *cobra.Command, _ []string) {
+			list(snippet.COMMAND)
+		},
+	}
+
+	listCodeCmd = &cobra.Command{
+		Use:   "code CODE",
+		Short: "List code snippets",
+		Long:  `List code snippets`,
+		Args:  cobra.NoArgs,
+		Run: func(_ *cobra.Command, _ []string) {
+			list(snippet.CODE)
+		},
+	}
+
+	listBookmarkCmd = &cobra.Command{
+		Use:     "url SNIPPET",
+		Aliases: []string{"bookmark", "bm"},
+		Short:   "List bookmarks",
+		Long:    `List bookmarks`,
+		Run: func(_ *cobra.Command, _ []string) {
+			list(snippet.BOOKMARK)
+		},
+	}
+)
 
 var tags, language string
 
-func list(cmd *cobra.Command, args []string) {
-	filters := snippet.Filters{Language: language}
+func list(t snippet.SnippetType) {
+	filters := snippet.Filters{
+		Language: language,
+		Type:     t,
+	}
 	if tags != "" {
 		filters.Tags = tags
-	}
-	if len(args) > 0 {
-		filters.Type = strings.ToUpper(args[0])
 	}
 
 	r := snippet.NewRepository()
@@ -42,7 +67,11 @@ func list(cmd *cobra.Command, args []string) {
 }
 
 func init() {
-	listCmd.Flags().StringVarP(&tags, "tags", "t", "", "Tags filter (comma separated)")
-	listCmd.Flags().StringVarP(&language, "language", "l", "", "Language filter")
+	listCmd.AddCommand(listCommandCmd)
+	listCmd.AddCommand(listCodeCmd)
+	listCmd.AddCommand(listBookmarkCmd)
 	rootCmd.AddCommand(listCmd)
+
+	listCmd.PersistentFlags().StringVarP(&tags, "tags", "t", "", "Tags filter (comma separated)")
+	listCodeCmd.Flags().StringVarP(&language, "language", "l", "", "Language filter")
 }

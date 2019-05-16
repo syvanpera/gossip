@@ -58,12 +58,12 @@ func (c *Command) String() string {
 	return output.String()
 }
 
-func NewCommand(command, description string, tags string) *Command {
+func NewCommand(content, description string, tags string) *Command {
 	cmd := Command{
 		data: SnippetData{
-			Content:     command,
+			Content:     content,
 			Description: description,
-			Tags:        tags,
+			Tags:        strings.ToLower(tags),
 			Type:        COMMAND,
 		},
 	}

@@ -3,6 +3,13 @@ package snippet
 import (
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
+
+	"github.com/logrusorgru/aurora"
+	"github.com/mattn/go-runewidth"
+	"github.com/spf13/viper"
+	"github.com/syvanpera/gossip/util"
 )
 
 const (
@@ -34,17 +41,6 @@ type Snippet interface {
 	String() string
 }
 
-type Code struct {
-	data SnippetData
-}
-
-func (c *Code) Type() SnippetType  { return CODE }
-func (c *Code) Data() *SnippetData { return &c.data }
-func (c *Code) Execute() error     { return ErrNotExecutable }
-func (c *Code) String() string {
-	return renderCode(c.data)
-}
-
 type Snip struct {
 	data SnippetData
 }
@@ -52,11 +48,35 @@ type Snip struct {
 func (s *Snip) Type() SnippetType  { return SNIP }
 func (s *Snip) Data() *SnippetData { return &s.data }
 func (s *Snip) Execute() error     { return ErrNotExecutable }
-func (s *Snip) String() string     { return render(s.data) }
+func (s *Snip) String() string {
+	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
+	au := aurora.NewAurora(colors)
+
+	var output strings.Builder
+	width, _ := util.GetTerminalSize()
+	description := runewidth.Truncate(s.data.Description, width-10, au.Gray(8, "...").String())
+	border := strings.Repeat("─", width)
+	borderVert := au.Gray(8, "│")
+
+	fmt.Fprintln(&output, au.Gray(8, util.ReplaceRuneAtIndex(border, '┬', 8)))
+	fmt.Fprintf(&output, "%s%s %s\n",
+		au.Cyan(util.CenterStr(fmt.Sprintf("#%d", s.data.ID), 8)),
+		borderVert,
+		au.Yellow(description))
+	fmt.Fprintln(&output, au.Gray(8, util.ReplaceRuneAtIndex(border, '┼', 8)))
+
+	for i, s := range strings.Split(s.data.Content, "\n") {
+		fmt.Fprintf(&output, "%s", au.Gray(8, util.CenterStr(strconv.Itoa(i+1), 8)))
+		fmt.Fprintf(&output, "%s %s\n", borderVert, s)
+	}
+	fmt.Fprintln(&output, au.Gray(8, util.ReplaceRuneAtIndex(border, '┴', 8)))
+
+	return output.String()
+}
 
 // Filters are used to filter the snippets list
 type Filters struct {
-	Type     string
+	Type     SnippetType
 	Language string
 	Tags     string
 }

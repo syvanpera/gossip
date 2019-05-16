@@ -83,17 +83,17 @@ func testEdit(cmd *cobra.Command, args []string) {
 	}
 	f.Close()
 
-	command := exec.Command("nvim", fpath)
+	editor, _ := exec.LookPath(os.Getenv("EDITOR"))
+
+	command := exec.Command(editor, fpath)
 	command.Stdin = os.Stdin
 	command.Stdout = os.Stdout
 	command.Stderr = os.Stderr
-	err = command.Start()
-	if err != nil {
+	if err = command.Start(); err != nil {
 		log.Printf("Error while launching editor. Error: %v\n", err)
 		log.Fatal(err)
 	}
-	err = command.Wait()
-	if err != nil {
+	if err = command.Wait(); err != nil {
 		log.Printf("Error while editing. Error: %v\n", err)
 		log.Fatal(err)
 	}
@@ -103,7 +103,8 @@ func testEdit(cmd *cobra.Command, args []string) {
 		log.Printf("Error while reading. Error: %v\n", err)
 		log.Fatal(err)
 	}
-	fmt.Println(string(data))
+	content := string(data)
+	fmt.Printf("%v %d\n", content, len(content))
 }
 
 func testRender(cmd *cobra.Command, args []string) {

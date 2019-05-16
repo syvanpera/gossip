@@ -49,7 +49,7 @@ func NewBookmark(url, description string, tags string) *Bookmark {
 		data: SnippetData{
 			Content:     url,
 			Description: description,
-			Tags:        tags,
+			Tags:        strings.ToLower(tags),
 			Type:        BOOKMARK,
 		},
 	}

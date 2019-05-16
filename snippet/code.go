@@ -88,27 +88,58 @@ var style = styles.Register(chroma.MustNewStyle("gruvbox", chroma.StyleEntries{
 	chroma.TextWhitespace:           "#fdf4c1",
 }))
 
-func renderCode(s SnippetData) string {
+type Code struct {
+	data SnippetData
+}
+
+func (c *Code) Type() SnippetType  { return CODE }
+func (c *Code) Data() *SnippetData { return &c.data }
+
+func (c *Code) Execute() error {
+	// fmt.Print(c)
+
+	// prompt := promptui.Prompt{
+	// 	Label:     "Are you sure you want to execute this command",
+	// 	IsConfirm: true,
+	// }
+
+	// if _, err := prompt.Run(); err != nil {
+	// 	fmt.Println("Canceled")
+	// 	return err
+	// }
+
+	// var command *exec.Cmd
+	// command = exec.Command("sh", "-c", c.data.Content)
+	// command.Stderr = os.Stderr
+	// command.Stdout = os.Stdout
+	// command.Stdin = os.Stdin
+
+	// command.Run()
+
+	return nil
+}
+
+func (c *Code) String() string {
 	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
 	au := aurora.NewAurora(colors)
 
 	var output strings.Builder
 	width, _ := util.GetTerminalSize()
-	description := runewidth.Truncate(s.Description, width-10, au.Gray(8, "...").String())
+	description := runewidth.Truncate(c.data.Description, width-10, au.Gray(8, "...").String())
 	border := strings.Repeat("─", width)
 	borderVert := au.Gray(8, "│")
 
-	fmt.Fprintln(&output, au.Gray(8, util.ReplaceRuneAtIndex(border, '┬', 8)))
+	fmt.Fprintf(&output, "\n%s", au.Gray(8, util.ReplaceRuneAtIndex(border, '┬', 8)))
 	fmt.Fprintf(&output, "%s%s %s\n",
-		au.Cyan(util.CenterStr(fmt.Sprintf("#%d", s.ID), 8)),
+		au.Cyan(util.CenterStr(fmt.Sprintf("#%d", c.data.ID), 8)),
 		borderVert,
 		au.Yellow(description))
 	fmt.Fprintln(&output, au.Gray(8, util.ReplaceRuneAtIndex(border, '┼', 8)))
 
-	content := s.Content
+	content := c.data.Content
 	if colors {
 		var sb strings.Builder
-		quick.Highlight(&sb, s.Content, s.Language, "terminal16m", "gruvbox")
+		quick.Highlight(&sb, c.data.Content, c.data.Language, "terminal16m", "gruvbox")
 		content = sb.String()
 	}
 
@@ -116,33 +147,21 @@ func renderCode(s SnippetData) string {
 		fmt.Fprintf(&output, "%s", au.Gray(8, util.CenterStr(strconv.Itoa(i+1), 8)))
 		fmt.Fprintf(&output, "%s %s\n", borderVert, s)
 	}
-	fmt.Fprintln(&output, au.Gray(8, util.ReplaceRuneAtIndex(border, '┴', 8)))
+	fmt.Fprintf(&output, "%s", au.Gray(8, util.ReplaceRuneAtIndex(border, '┴', 8)))
 
 	return output.String()
 }
 
-func render(s SnippetData) string {
-	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
-	au := aurora.NewAurora(colors)
-
-	var output strings.Builder
-	width, _ := util.GetTerminalSize()
-	description := runewidth.Truncate(s.Description, width-10, au.Gray(8, "...").String())
-	border := strings.Repeat("─", width)
-	borderVert := au.Gray(8, "│")
-
-	fmt.Fprintln(&output, au.Gray(8, util.ReplaceRuneAtIndex(border, '┬', 8)))
-	fmt.Fprintf(&output, "%s%s %s\n",
-		au.Cyan(util.CenterStr(fmt.Sprintf("#%d", s.ID), 8)),
-		borderVert,
-		au.Yellow(description))
-	fmt.Fprintln(&output, au.Gray(8, util.ReplaceRuneAtIndex(border, '┼', 8)))
-
-	for i, s := range strings.Split(s.Content, "\n") {
-		fmt.Fprintf(&output, "%s", au.Gray(8, util.CenterStr(strconv.Itoa(i+1), 8)))
-		fmt.Fprintf(&output, "%s %s\n", borderVert, s)
+func NewCode(content, description string, tags string, language string) *Code {
+	cmd := Code{
+		data: SnippetData{
+			Content:     content,
+			Description: description,
+			Tags:        strings.ToLower(tags),
+			Language:    strings.ToLower(language),
+			Type:        CODE,
+		},
 	}
-	fmt.Fprintln(&output, au.Gray(8, util.ReplaceRuneAtIndex(border, '┴', 8)))
 
-	return output.String()
+	return &cmd
 }

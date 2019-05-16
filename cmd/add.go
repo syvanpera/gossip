@@ -2,6 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+	"os/exec"
 	"regexp"
 
 	"github.com/manifoldco/promptui"
@@ -33,42 +37,61 @@ var (
 		Use:   "code CODE",
 		Short: "Add new code snippet",
 		Long:  `Add new code snippet`,
-		Args:  cobra.MinimumNArgs(1),
+		Args:  cobra.NoArgs,
 		Run:   addCode,
 	}
 
 	addBookmarkCmd = &cobra.Command{
-		Use:     "bm SNIPPET",
-		Aliases: []string{"bookmark", "url"},
+		Use:     "url SNIPPET",
+		Aliases: []string{"bookmark", "bm"},
 		Short:   "Add new bookmark",
 		Long:    `Add new bookmark`,
-		// Args:    cobra.MinimumNArgs(1),
-		Run: addBookmark,
+		Args:    cobra.MaximumNArgs(2),
+		Run:     addBookmark,
 	}
 )
 
 func addCommand(_ *cobra.Command, _ []string) {
 	tags := tagsFlag
-	command := ""
-	if command = promptFor("Command"); command == "" {
+	content := ""
+	if content = prompt("Command"); content == "" {
 		fmt.Println("Canceled")
 		return
 	}
 
 	description := ""
-	if description = promptFor("Description"); description == "" {
+	if description = prompt("Description"); description == "" {
 		fmt.Println("Canceled")
 		return
 	}
 
-	cmd := snippet.NewCommand(command, description, tags)
-	snippet.NewRepository().Add(cmd)
+	command := snippet.NewCommand(content, description, tags)
+	snippet.NewRepository().Add(command)
 
-	fmt.Printf("Command added\n%s", cmd.String())
+	fmt.Printf("Command added\n%s", command.String())
 }
 
 func addCode(_ *cobra.Command, args []string) {
-	fmt.Printf("addCode: %v", args)
+	description := ""
+	if description = prompt("Description"); description == "" {
+		fmt.Println("Canceled")
+		return
+	}
+
+	content := ""
+	if content = fromEditor(); content == "" {
+		fmt.Println("Canceled")
+		return
+	}
+
+	language := prompt("Language")
+
+	tags := tagsFlag
+
+	code := snippet.NewCode(content, description, tags, language)
+	snippet.NewRepository().Add(code)
+
+	fmt.Printf("Code snippet added\n%s", code.String())
 }
 
 func addBookmark(_ *cobra.Command, args []string) {
@@ -78,7 +101,7 @@ func addBookmark(_ *cobra.Command, args []string) {
 	}
 
 	if url == "" {
-		if url = promptFor("URL"); url == "" {
+		if url = prompt("URL"); url == "" {
 			fmt.Println("Canceled")
 			return
 		}
@@ -112,7 +135,7 @@ func addBookmark(_ *cobra.Command, args []string) {
 	fmt.Printf("Bookmark added\n%s", bookmark.String())
 }
 
-func promptFor(label string) string {
+func prompt(label string) string {
 	prompt := promptui.Prompt{
 		Label: label,
 	}
@@ -126,6 +149,34 @@ func promptFor(label string) string {
 	}
 
 	return input
+}
+
+func fromEditor() string {
+	fpath := os.TempDir() + "/gossip.tmp"
+	f, err := os.Create(fpath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	f.Close()
+
+	editor, _ := exec.LookPath(os.Getenv("EDITOR"))
+
+	command := exec.Command(editor, fpath)
+	command.Stdin = os.Stdin
+	command.Stdout = os.Stdout
+	command.Stderr = os.Stderr
+	if err = command.Start(); err != nil {
+		return ""
+	}
+	if err = command.Wait(); err != nil {
+		return ""
+	}
+
+	data, err := ioutil.ReadFile(fpath)
+	if err != nil {
+		return ""
+	}
+	return string(data)
 }
 
 func init() {
