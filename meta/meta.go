@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
+	"strings"
 )
 
 var ErrMetaExtraction = errors.New("can't extract metadata")
@@ -43,7 +44,7 @@ func (Generic) Extract(url string) (*MetaData, error) {
 	if result == nil || len(result) < 2 {
 		return nil, errors.New("can't find <title> tag")
 	}
-	description := html.UnescapeString(result[1])
+	description := strings.TrimSpace(html.UnescapeString(result[1]))
 
 	meta := MetaData{
 		Description: description,

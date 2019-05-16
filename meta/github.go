@@ -41,7 +41,7 @@ func (Github) Extract(url string) (*MetaData, error) {
 	}
 
 	meta := MetaData{
-		Description: html.UnescapeString(fmt.Sprintf("%s: %s", *repos.FullName, *repos.Description)),
+		Description: strings.TrimSpace(html.UnescapeString(fmt.Sprintf("%s: %s", *repos.FullName, *repos.Description))),
 		Tags:        fmt.Sprintf("%s,%s", "github", strings.ToLower(html.UnescapeString(*repos.Language))),
 	}
 

@@ -63,8 +63,7 @@ func addBookmark(cmd *cobra.Command, args []string) {
 	}
 
 	if url == "" {
-		url = promptFor("Url")
-		if url == "" {
+		if url = promptFor("URL"); url == "" {
 			fmt.Println("Canceled")
 			return
 		}
@@ -98,9 +97,9 @@ func addBookmark(cmd *cobra.Command, args []string) {
 	fmt.Printf("Bookmark added\n%s", bookmark.String())
 }
 
-func promptFor(lable string) string {
+func promptFor(label string) string {
 	prompt := promptui.Prompt{
-		Label: "URL",
+		Label: label,
 	}
 
 	input, err := prompt.Run()
