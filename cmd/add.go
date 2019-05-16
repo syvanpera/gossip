@@ -79,7 +79,7 @@ func addBookmark(cmd *cobra.Command, args []string) {
 	}
 
 	bookmark := snippet.NewBookmark(url, description, tags)
-	if err := snippet.NewRepository().Upsert(bookmark); err != nil {
+	if err := snippet.NewRepository().Add(bookmark); err != nil {
 		fmt.Println(err)
 		return
 	}

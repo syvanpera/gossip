@@ -18,7 +18,7 @@ type Repository struct {
 	db *sql.DB
 }
 
-// NewRepository creates a new snippet resository
+// NewRepository returns a new snippet resository
 func NewRepository() *Repository {
 	return &Repository{db: openDB(viper.GetString("database"))}
 }
@@ -26,7 +26,8 @@ func NewRepository() *Repository {
 func openDB(file string) *sql.DB {
 	util.EnsureDir(file)
 	db, _ := sql.Open("sqlite3", file)
-	stmt, _ := db.Prepare(`
+
+	schema := `
 		CREATE TABLE IF NOT EXISTS snippets (
 			id INTEGER PRIMARY KEY,
 			content TEXT,
@@ -34,17 +35,17 @@ func openDB(file string) *sql.DB {
 			tags TEXT,
 			type TEXT,
 			language TEXT
-		)`)
-	_, err := stmt.Exec()
-	if err != nil {
-		log.Fatal(err)
+		)`
+
+	if _, err := db.Exec(schema); err != nil {
+		panic(err)
 	}
 
 	return db
 }
 
-// Upsert either inserts a new snippet or updates an existing one
-func (r *Repository) Upsert(s Snippet) error {
+// Add a new snippet to the database
+func (r *Repository) Add(s Snippet) error {
 	sd := s.Data()
 	stmt, _ := r.db.Prepare(`
 		INSERT INTO snippets (content, description, tags, type, language)
