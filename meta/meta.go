@@ -9,6 +9,8 @@ import (
 	"regexp"
 )
 
+var ErrMetaExtraction = errors.New("can't extract metadata")
+
 var extractors []Extractor
 
 type MetaData struct {
@@ -18,7 +20,7 @@ type MetaData struct {
 
 type Extractor interface {
 	CanHandle(url string) bool
-	Extract(url string) *MetaData
+	Extract(url string) (*MetaData, error)
 }
 
 type Generic struct{}
@@ -53,7 +55,8 @@ func (Generic) Extract(url string) (*MetaData, error) {
 func Extract(url string) *MetaData {
 	for _, e := range extractors {
 		if e.CanHandle(url) {
-			return e.Extract(url)
+			meta, _ := e.Extract(url)
+			return meta
 		}
 	}
 

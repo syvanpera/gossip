@@ -72,7 +72,7 @@ func addBookmark(cmd *cobra.Command, args []string) {
 	}
 
 	if description == "" || len(tags) == 0 {
-		if meta, err := meta.Extract(url); err == nil {
+		if meta := meta.Extract(url); meta != nil {
 			description = meta.Description
 			tags = append(tags, meta.Tags...)
 		}
@@ -84,7 +84,7 @@ func addBookmark(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	fmt.Printf("New bookmark (ID: %d) added\n%s", bookmark.Data().ID, bookmark.String())
+	fmt.Printf("New bookmark added\n%s", bookmark.String())
 }
 
 func init() {
