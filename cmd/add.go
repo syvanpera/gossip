@@ -20,49 +20,89 @@ var (
 	addCmd = &cobra.Command{
 		Use:     "add",
 		Aliases: []string{"new", "a"},
-		Short:   "Add new snippet",
-		Long:    `Add new snippet"`,
+		Short:   "Add a new snippet",
+		Long:    `Add a new snippet"`,
+		Args:    cobra.MinimumNArgs(1),
+		Run:     add,
 	}
 
 	addCommandCmd = &cobra.Command{
 		Use:     "cmd",
 		Aliases: []string{"command"},
-		Short:   "Add new command snippet",
-		Long:    `Add new command snippet`,
-		Args:    cobra.NoArgs,
+		Short:   "Add a new command snippet",
+		Long:    `Add a new command snippet`,
+		Args:    cobra.MaximumNArgs(2),
 		Run:     addCommand,
 	}
 
 	addCodeCmd = &cobra.Command{
 		Use:   "code CODE",
-		Short: "Add new code snippet",
-		Long:  `Add new code snippet`,
-		Args:  cobra.NoArgs,
+		Short: "Add a new code snippet",
+		Long:  `Add a new code snippet`,
+		Args:  cobra.MaximumNArgs(1),
 		Run:   addCode,
 	}
 
 	addBookmarkCmd = &cobra.Command{
 		Use:     "url SNIPPET",
 		Aliases: []string{"bookmark", "bm"},
-		Short:   "Add new bookmark",
-		Long:    `Add new bookmark`,
+		Short:   "Add a new bookmark",
+		Long:    `Add a new bookmark`,
 		Args:    cobra.MaximumNArgs(2),
 		Run:     addBookmark,
 	}
 )
 
-func addCommand(_ *cobra.Command, _ []string) {
-	tags := tagsFlag
-	content := ""
-	if content = prompt("Command"); content == "" {
+func add(cmd *cobra.Command, args []string) {
+	if matched, _ := regexp.MatchString("^https?://*", args[0]); matched {
+		addBookmark(cmd, args)
+		return
+	}
+
+	prompt := promptui.Select{
+		Label: "Add what",
+		Items: []string{"Command", "Code snippet", "Bookmark"},
+	}
+
+	_, result, err := prompt.Run()
+
+	if err != nil {
 		fmt.Println("Canceled")
 		return
 	}
 
+	switch result {
+	case "Command":
+		addCommand(cmd, args)
+	case "Code snippet":
+		addCode(cmd, args)
+	case "Bookmark":
+		addBookmark(cmd, args)
+	}
+}
+
+func addCommand(_ *cobra.Command, args []string) {
+	tags := tagsFlag
+	content := ""
+	if len(args) > 0 {
+		content = args[0]
+	}
+	if content == "" {
+		if content = prompt("Command"); content == "" {
+			fmt.Println("Canceled")
+			return
+		}
+	}
+
 	description := ""
-	if description = prompt("Description"); description == "" {
-		fmt.Println("Canceled")
-		return
+	if len(args) > 1 {
+		description = args[1]
+	}
+	if description == "" {
+		if description = prompt("Description"); description == "" {
+			fmt.Println("Canceled")
+			return
+		}
 	}
 
 	command := snippet.NewCommand(content, description, tags)
@@ -73,9 +113,14 @@ func addCommand(_ *cobra.Command, _ []string) {
 
 func addCode(_ *cobra.Command, args []string) {
 	description := ""
-	if description = prompt("Description"); description == "" {
-		fmt.Println("Canceled")
-		return
+	if len(args) > 0 {
+		description = args[0]
+	}
+	if description == "" {
+		if description = prompt("Description"); description == "" {
+			fmt.Println("Canceled")
+			return
+		}
 	}
 
 	content := ""
