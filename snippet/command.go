@@ -19,7 +19,7 @@ func (cmd *Command) Type() SnippetType  { return COMMAND }
 func (cmd *Command) Data() *SnippetData { return &cmd.data }
 
 func (c *Command) Execute() error {
-	fmt.Print(c)
+	fmt.Println(c)
 
 	prompt := promptui.Prompt{
 		Label:     "Are you sure you want to execute this command",
