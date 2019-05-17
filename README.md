@@ -18,4 +18,8 @@ Inspired by
 
 ## Demo
 
-<img src="demo.gif" width="700">
+### Bookmarks
+<img src="demo-bookmarks.gif" width="700">
+
+### Code snippets
+<img src="demo-code.gif" width="700">
