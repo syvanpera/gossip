@@ -99,9 +99,9 @@ func (c *Code) Execute() error {
 	return ErrNotExecutable
 }
 
-func (c *Code) Edit(content, description string) {
+func (c *Code) Edit(content, description string) error {
 	fmt.Println("Edit code ", c)
-	return
+	return nil
 }
 
 func (c *Code) String() string {

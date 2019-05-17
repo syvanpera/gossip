@@ -19,8 +19,9 @@ const (
 	SNIP     = "SNIP"
 )
 
-var ErrNotExecutable = errors.New("Not executable")
-var ErrExecCanceled = errors.New("Execution canceled")
+var ErrNotExecutable = errors.New("not executable")
+var ErrExecCanceled = errors.New("execution canceled")
+var ErrEditCanceled = errors.New("edit canceled")
 
 // SnippetData contains the data for one snippet
 type SnippetData struct {
@@ -38,7 +39,7 @@ type Snippet interface {
 	Type() SnippetType
 	Data() *SnippetData
 	Execute() error
-	Edit(content, description string)
+	Edit(content, description string) error
 	String() string
 }
 
@@ -46,10 +47,10 @@ type Snip struct {
 	data SnippetData
 }
 
-func (*Snip) Type() SnippetType                { return SNIP }
-func (s *Snip) Data() *SnippetData             { return &s.data }
-func (*Snip) Execute() error                   { return ErrNotExecutable }
-func (*Snip) Edit(content, description string) {}
+func (*Snip) Type() SnippetType                      { return SNIP }
+func (s *Snip) Data() *SnippetData                   { return &s.data }
+func (*Snip) Execute() error                         { return ErrNotExecutable }
+func (*Snip) Edit(content, description string) error { return nil }
 func (s *Snip) String() string {
 	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
 	au := aurora.NewAurora(colors)

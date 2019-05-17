@@ -39,7 +39,10 @@ func edit(_ *cobra.Command, args []string) {
 		return
 	}
 
-	s.Edit("", "")
+	if err := s.Edit("", ""); err != nil {
+		fmt.Println("Canceled")
+		return
+	}
 
 	existingTags := strings.Split(s.Data().Tags, ",")
 	tags := strings.Split(addTags, ",")

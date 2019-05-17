@@ -35,13 +35,12 @@ func (b *Bookmark) Execute() error {
 	return nil
 }
 
-func (b *Bookmark) Edit(content, description string) {
+func (b *Bookmark) Edit(content, description string) error {
 	if content == "" {
 		content = b.Data().Content
 	}
 	if content = ui.Prompt("URL", content); content == "" {
-		fmt.Println("Canceled")
-		return
+		return ErrEditCanceled
 	}
 	b.Data().Content = content
 
@@ -49,10 +48,11 @@ func (b *Bookmark) Edit(content, description string) {
 		description = b.Data().Description
 	}
 	if description = ui.Prompt("Description", b.Data().Description); description == "" {
-		fmt.Println("Canceled")
-		return
+		return ErrEditCanceled
 	}
 	b.Data().Description = description
+
+	return nil
 }
 
 func (b *Bookmark) String() string {

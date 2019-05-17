@@ -36,13 +36,12 @@ func (c *Command) Execute() error {
 	return nil
 }
 
-func (c *Command) Edit(content, description string) {
+func (c *Command) Edit(content, description string) error {
 	if content == "" {
 		content = c.Data().Content
 	}
 	if content = ui.Prompt("URL", content); content == "" {
-		fmt.Println("Canceled")
-		return
+		return ErrEditCanceled
 	}
 	c.Data().Content = content
 
@@ -50,10 +49,11 @@ func (c *Command) Edit(content, description string) {
 		description = c.Data().Description
 	}
 	if description = ui.Prompt("Description", c.Data().Description); description == "" {
-		fmt.Println("Canceled")
-		return
+		return ErrEditCanceled
 	}
 	c.Data().Description = description
+
+	return nil
 }
 
 func (c *Command) String() string {
