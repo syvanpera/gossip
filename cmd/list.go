@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"github.com/syvanpera/gossip/snippet"
 )
@@ -13,6 +14,7 @@ var (
 		Aliases: []string{"ls", "l"},
 		Short:   "List snippets",
 		Long:    `List snippets`,
+		Run:     listDefault,
 	}
 
 	listCommandCmd = &cobra.Command{
@@ -48,6 +50,29 @@ var (
 )
 
 var tags, language string
+
+func listDefault(_ *cobra.Command, _ []string) {
+	prompt := promptui.Select{
+		Label: "List what",
+		Items: []string{"Bookmarks", "Commands", "Code snippets"},
+	}
+
+	_, result, err := prompt.Run()
+
+	if err != nil {
+		fmt.Println("Canceled")
+		return
+	}
+
+	switch result {
+	case "Bookmarks":
+		list(snippet.BOOKMARK)
+	case "Commands":
+		list(snippet.COMMAND)
+	case "Code snippets":
+		list(snippet.CODE)
+	}
+}
 
 func list(t snippet.SnippetType) {
 	filters := snippet.Filters{

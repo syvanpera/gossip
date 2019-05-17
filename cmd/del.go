@@ -39,7 +39,7 @@ func del(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	fmt.Print(s)
+	fmt.Println(s)
 
 	prompt := promptui.Prompt{
 		Label:     "Are you sure you want to delete this snippet",

@@ -49,8 +49,7 @@ func editCommand(_ *cobra.Command, args []string) {
 			newTags = append(newTags, tag)
 		}
 	}
-
-	s.Data().Tags = strings.Join(newTags, ",")
+	s.Data().Tags = strings.Trim(strings.Join(newTags, ","), " ,")
 	r.Save(s)
 
 	fmt.Println(s)

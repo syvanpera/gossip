@@ -61,7 +61,7 @@ func add(cmd *cobra.Command, args []string) {
 
 	prompt := promptui.Select{
 		Label: "Add what",
-		Items: []string{"Command", "Code snippet", "Bookmark"},
+		Items: []string{"Bookmark", "Command", "Code snippet"},
 	}
 
 	_, result, err := prompt.Run()
@@ -72,12 +72,12 @@ func add(cmd *cobra.Command, args []string) {
 	}
 
 	switch result {
+	case "Bookmark":
+		addBookmark(cmd, args)
 	case "Command":
 		addCommand(cmd, args)
 	case "Code snippet":
 		addCode(cmd, args)
-	case "Bookmark":
-		addBookmark(cmd, args)
 	}
 }
 
