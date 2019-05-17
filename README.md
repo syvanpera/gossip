@@ -23,3 +23,6 @@ Inspired by
 
 ### Code snippets
 <img src="demo-code.gif" width="700">
+
+### Commands
+<img src="demo-commands.gif" width="700">
