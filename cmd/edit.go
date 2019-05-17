@@ -13,7 +13,7 @@ import (
 var addTags string
 
 var editCmd = &cobra.Command{
-	Use:     "edit ID",
+	Use:     "edit ID [CONTENT] [DESCRIPTION]",
 	Aliases: []string{"ed", "e"},
 	Short:   "Edit a snippet",
 	Long:    `Edit a snippet"`,
@@ -26,10 +26,10 @@ var editCmd = &cobra.Command{
 		}
 		return fmt.Errorf("invalid ID number specified: %s", args[0])
 	},
-	Run: editCommand,
+	Run: edit,
 }
 
-func editCommand(_ *cobra.Command, args []string) {
+func edit(_ *cobra.Command, args []string) {
 	id, _ := strconv.Atoi(args[0])
 	r := snippet.NewRepository()
 
@@ -38,6 +38,8 @@ func editCommand(_ *cobra.Command, args []string) {
 		fmt.Printf("Snippet with ID %d not found\n", id)
 		return
 	}
+
+	s.Edit("", "")
 
 	existingTags := strings.Split(s.Data().Tags, ",")
 	tags := strings.Split(addTags, ",")

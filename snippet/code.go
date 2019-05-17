@@ -96,27 +96,12 @@ func (c *Code) Type() SnippetType  { return CODE }
 func (c *Code) Data() *SnippetData { return &c.data }
 
 func (c *Code) Execute() error {
-	// fmt.Print(c)
+	return ErrNotExecutable
+}
 
-	// prompt := promptui.Prompt{
-	// 	Label:     "Are you sure you want to execute this command",
-	// 	IsConfirm: true,
-	// }
-
-	// if _, err := prompt.Run(); err != nil {
-	// 	fmt.Println("Canceled")
-	// 	return err
-	// }
-
-	// var command *exec.Cmd
-	// command = exec.Command("sh", "-c", c.data.Content)
-	// command.Stderr = os.Stderr
-	// command.Stdout = os.Stdout
-	// command.Stdin = os.Stdin
-
-	// command.Run()
-
-	return nil
+func (c *Code) Edit(content, description string) {
+	fmt.Println("Edit code ", c)
+	return
 }
 
 func (c *Code) String() string {

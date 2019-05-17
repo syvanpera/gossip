@@ -34,6 +34,26 @@ func (b *Bookmark) Execute() error {
 	return nil
 }
 
+func (b *Bookmark) Edit(content, description string) {
+	if content == "" {
+		content = b.Data().Content
+	}
+	if content = prompt("URL", content); content == "" {
+		fmt.Println("Canceled")
+		return
+	}
+	b.Data().Content = content
+
+	if description == "" {
+		description = b.Data().Description
+	}
+	if description = prompt("Description", b.Data().Description); description == "" {
+		fmt.Println("Canceled")
+		return
+	}
+	b.Data().Description = description
+}
+
 func (b *Bookmark) String() string {
 	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
 	au := aurora.NewAurora(colors)

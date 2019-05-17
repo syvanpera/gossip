@@ -42,6 +42,26 @@ func (c *Command) Execute() error {
 	return nil
 }
 
+func (c *Command) Edit(content, description string) {
+	if content == "" {
+		content = c.Data().Content
+	}
+	if content = prompt("URL", content); content == "" {
+		fmt.Println("Canceled")
+		return
+	}
+	c.Data().Content = content
+
+	if description == "" {
+		description = c.Data().Description
+	}
+	if description = prompt("Description", c.Data().Description); description == "" {
+		fmt.Println("Canceled")
+		return
+	}
+	c.Data().Description = description
+}
+
 func (c *Command) String() string {
 	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
 	au := aurora.NewAurora(colors)

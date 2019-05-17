@@ -87,6 +87,7 @@ func addCommand(_ *cobra.Command, args []string) {
 	if len(args) > 0 {
 		content = args[0]
 	}
+	// TODO Refactor to use the Edit method from the Snippet
 	if content == "" {
 		if content = prompt("Command"); content == "" {
 			fmt.Println("Canceled")
@@ -140,20 +141,20 @@ func addCode(_ *cobra.Command, args []string) {
 }
 
 func addBookmark(_ *cobra.Command, args []string) {
-	url := ""
+	content := ""
 	if len(args) > 0 {
-		url = args[0]
+		content = args[0]
 	}
 
-	if url == "" {
-		if url = prompt("URL"); url == "" {
+	if content == "" {
+		if content = prompt("URL"); content == "" {
 			fmt.Println("Canceled")
 			return
 		}
 	}
 
-	if matched, _ := regexp.MatchString("^https?://*", url); !matched {
-		url = "http://" + url
+	if matched, _ := regexp.MatchString("^https?://*", content); !matched {
+		content = "http://" + content
 	}
 
 	description := ""
@@ -164,7 +165,7 @@ func addBookmark(_ *cobra.Command, args []string) {
 	tags := tagsFlag
 
 	if description == "" || tags == "" {
-		if meta := meta.Extract(url); meta != nil {
+		if meta := meta.Extract(content); meta != nil {
 			if description == "" {
 				description = meta.Description
 			}
@@ -174,7 +175,7 @@ func addBookmark(_ *cobra.Command, args []string) {
 		}
 	}
 
-	bookmark := snippet.NewBookmark(url, description, tags)
+	bookmark := snippet.NewBookmark(content, description, tags)
 	snippet.NewRepository().Add(bookmark)
 
 	fmt.Printf("Bookmark added\n%s", bookmark.String())

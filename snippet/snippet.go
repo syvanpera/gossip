@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/logrusorgru/aurora"
+	"github.com/manifoldco/promptui"
 	"github.com/mattn/go-runewidth"
 	"github.com/spf13/viper"
 	"github.com/syvanpera/gossip/util"
@@ -38,6 +39,7 @@ type Snippet interface {
 	Type() SnippetType
 	Data() *SnippetData
 	Execute() error
+	Edit(content, description string)
 	String() string
 }
 
@@ -45,9 +47,10 @@ type Snip struct {
 	data SnippetData
 }
 
-func (s *Snip) Type() SnippetType  { return SNIP }
-func (s *Snip) Data() *SnippetData { return &s.data }
-func (s *Snip) Execute() error     { return ErrNotExecutable }
+func (*Snip) Type() SnippetType                { return SNIP }
+func (s *Snip) Data() *SnippetData             { return &s.data }
+func (*Snip) Execute() error                   { return ErrNotExecutable }
+func (*Snip) Edit(content, description string) {}
 func (s *Snip) String() string {
 	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
 	au := aurora.NewAurora(colors)
@@ -99,4 +102,22 @@ func New(sd SnippetData) Snippet {
 	default:
 		return &Snip{data: sd}
 	}
+}
+
+func prompt(label, defaultValue string) string {
+	prompt := promptui.Prompt{
+		Label:     label,
+		Default:   defaultValue,
+		AllowEdit: true,
+	}
+
+	input, err := prompt.Run()
+	if err != nil {
+		return ""
+	}
+	if input == "" {
+		return ""
+	}
+
+	return input
 }
