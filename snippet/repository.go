@@ -60,6 +60,18 @@ func (r *Repository) Add(s Snippet) {
 	}
 }
 
+// Save an existing snippet to the database
+func (r *Repository) Save(s Snippet) {
+	sd := s.Data()
+	query := `
+		UPDATE snippets SET
+		content = ?, description = ?, tags = ?, language = ?
+		WHERE id = ?`
+	if _, err := r.db.Exec(query, sd.Content, sd.Description, sd.Tags, sd.Language, sd.ID); err != nil {
+		panic(err)
+	}
+}
+
 // Get returns a snippet with the given ID
 func (r *Repository) Get(id int) Snippet {
 	var s SnippetData
