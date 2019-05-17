@@ -3,9 +3,9 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"github.com/syvanpera/gossip/snippet"
+	"github.com/syvanpera/gossip/ui"
 )
 
 var (
@@ -52,19 +52,14 @@ var (
 var tags, language string
 
 func listDefault(_ *cobra.Command, _ []string) {
-	prompt := promptui.Select{
-		Label: "List what",
-		Items: []string{"Bookmarks", "Commands", "Code snippets"},
-	}
-
-	_, result, err := prompt.Run()
+	choice, err := ui.Choose("List what", []string{"Bookmarks", "Commands", "Code snippets"})
 
 	if err != nil {
 		fmt.Println("Canceled")
 		return
 	}
 
-	switch result {
+	switch choice {
 	case "Bookmarks":
 		list(snippet.BOOKMARK)
 	case "Commands":

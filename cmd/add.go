@@ -8,10 +8,10 @@ import (
 	"os/exec"
 	"regexp"
 
-	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"github.com/syvanpera/gossip/meta"
 	"github.com/syvanpera/gossip/snippet"
+	"github.com/syvanpera/gossip/ui"
 )
 
 var tagsFlag string
@@ -61,19 +61,14 @@ func add(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	prompt := promptui.Select{
-		Label: "Add what",
-		Items: []string{"Bookmark", "Command", "Code snippet"},
-	}
-
-	_, result, err := prompt.Run()
+	choice, err := ui.Choose("Add what", []string{"Bookmark", "Command", "Code snippet"})
 
 	if err != nil {
 		fmt.Println("Canceled")
 		return
 	}
 
-	switch result {
+	switch choice {
 	case "Bookmark":
 		addBookmark(cmd, args)
 	case "Command":
@@ -91,7 +86,7 @@ func addCommand(_ *cobra.Command, args []string) {
 	}
 	// TODO Refactor to use the Edit method from the Snippet
 	if content == "" {
-		if content = prompt("Command"); content == "" {
+		if content = ui.Prompt("Command", ""); content == "" {
 			fmt.Println("Canceled")
 			return
 		}
@@ -102,7 +97,7 @@ func addCommand(_ *cobra.Command, args []string) {
 		description = args[1]
 	}
 	if description == "" {
-		if description = prompt("Description"); description == "" {
+		if description = ui.Prompt("Description", ""); description == "" {
 			fmt.Println("Canceled")
 			return
 		}
@@ -120,7 +115,7 @@ func addCode(_ *cobra.Command, args []string) {
 		description = args[0]
 	}
 	if description == "" {
-		if description = prompt("Description"); description == "" {
+		if description = ui.Prompt("Description", ""); description == "" {
 			fmt.Println("Canceled")
 			return
 		}
@@ -132,7 +127,7 @@ func addCode(_ *cobra.Command, args []string) {
 		return
 	}
 
-	language := prompt("Language")
+	language := ui.Prompt("Language", "")
 
 	tags := tagsFlag
 
@@ -149,7 +144,7 @@ func addBookmark(_ *cobra.Command, args []string) {
 	}
 
 	if content == "" {
-		if content = prompt("URL"); content == "" {
+		if content = ui.Prompt("URL", ""); content == "" {
 			fmt.Println("Canceled")
 			return
 		}
@@ -181,22 +176,6 @@ func addBookmark(_ *cobra.Command, args []string) {
 	snippet.NewRepository().Add(bookmark)
 
 	fmt.Printf("Bookmark added\n%s", bookmark.String())
-}
-
-func prompt(label string) string {
-	prompt := promptui.Prompt{
-		Label: label,
-	}
-
-	input, err := prompt.Run()
-	if err != nil {
-		return ""
-	}
-	if input == "" {
-		return ""
-	}
-
-	return input
 }
 
 func fromEditor() string {

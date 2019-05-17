@@ -9,6 +9,7 @@ import (
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/browser"
 	"github.com/spf13/viper"
+	"github.com/syvanpera/gossip/ui"
 )
 
 type Bookmark struct {
@@ -38,7 +39,7 @@ func (b *Bookmark) Edit(content, description string) {
 	if content == "" {
 		content = b.Data().Content
 	}
-	if content = prompt("URL", content); content == "" {
+	if content = ui.Prompt("URL", content); content == "" {
 		fmt.Println("Canceled")
 		return
 	}
@@ -47,7 +48,7 @@ func (b *Bookmark) Edit(content, description string) {
 	if description == "" {
 		description = b.Data().Description
 	}
-	if description = prompt("Description", b.Data().Description); description == "" {
+	if description = ui.Prompt("Description", b.Data().Description); description == "" {
 		fmt.Println("Canceled")
 		return
 	}

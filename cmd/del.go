@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"github.com/syvanpera/gossip/snippet"
+	"github.com/syvanpera/gossip/ui"
 )
 
 var force bool
@@ -41,12 +41,7 @@ func del(cmd *cobra.Command, args []string) {
 
 	fmt.Println(s)
 
-	prompt := promptui.Prompt{
-		Label:     "Are you sure you want to delete this snippet",
-		IsConfirm: true,
-	}
-
-	if _, err := prompt.Run(); err != nil {
+	if !ui.Confirm("Are you sure you want to delete this snippet") {
 		return
 	}
 

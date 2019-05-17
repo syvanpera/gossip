@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/logrusorgru/aurora"
-	"github.com/manifoldco/promptui"
 	"github.com/spf13/viper"
+	"github.com/syvanpera/gossip/ui"
 )
 
 type Command struct {
@@ -21,14 +21,8 @@ func (cmd *Command) Data() *SnippetData { return &cmd.data }
 func (c *Command) Execute() error {
 	fmt.Println(c)
 
-	prompt := promptui.Prompt{
-		Label:     "Are you sure you want to execute this command",
-		IsConfirm: true,
-	}
-
-	if _, err := prompt.Run(); err != nil {
-		fmt.Println("Canceled")
-		return err
+	if !ui.Confirm("Are you sure you want to execute this command") {
+		return ErrExecCanceled
 	}
 
 	var command *exec.Cmd
@@ -46,7 +40,7 @@ func (c *Command) Edit(content, description string) {
 	if content == "" {
 		content = c.Data().Content
 	}
-	if content = prompt("URL", content); content == "" {
+	if content = ui.Prompt("URL", content); content == "" {
 		fmt.Println("Canceled")
 		return
 	}
@@ -55,7 +49,7 @@ func (c *Command) Edit(content, description string) {
 	if description == "" {
 		description = c.Data().Description
 	}
-	if description = prompt("Description", c.Data().Description); description == "" {
+	if description = ui.Prompt("Description", c.Data().Description); description == "" {
 		fmt.Println("Canceled")
 		return
 	}
