@@ -15,9 +15,6 @@ func Prompt(label, defaultValue string) string {
 	if err != nil {
 		return ""
 	}
-	if input == "" {
-		return ""
-	}
 
 	return input
 }
