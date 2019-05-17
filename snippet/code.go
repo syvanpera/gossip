@@ -129,7 +129,7 @@ func (c *Code) String() string {
 	border := strings.Repeat("─", width)
 	borderVert := au.Gray(8, "│")
 
-	fmt.Fprintf(&output, "\n%s", au.Gray(8, util.ReplaceRuneAtIndex(border, '┬', 8)))
+	fmt.Fprintf(&output, "\n%s\n", au.Gray(8, util.ReplaceRuneAtIndex(border, '┬', 8)))
 	fmt.Fprintf(&output, "%s%s %s\n",
 		au.Cyan(util.CenterStr(fmt.Sprintf("#%d", c.data.ID), 8)),
 		borderVert,
