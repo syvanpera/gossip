@@ -10,7 +10,7 @@ import (
 var (
 	listCmd = &cobra.Command{
 		Use:     "list",
-		Aliases: []string{"ls"},
+		Aliases: []string{"ls", "l"},
 		Short:   "List snippets",
 		Long:    `List snippets`,
 	}

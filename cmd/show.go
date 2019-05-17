@@ -11,7 +11,7 @@ import (
 
 var showCmd = &cobra.Command{
 	Use:     "show",
-	Aliases: []string{"get"},
+	Aliases: []string{"get", "s", "g"},
 	Short:   "Show a snippet",
 	Long:    `Show a snippet`,
 	Args: func(cmd *cobra.Command, args []string) error {

@@ -19,7 +19,7 @@ var tagsFlag string
 var (
 	addCmd = &cobra.Command{
 		Use:     "add",
-		Aliases: []string{"new"},
+		Aliases: []string{"new", "a"},
 		Short:   "Add new snippet",
 		Long:    `Add new snippet"`,
 	}
