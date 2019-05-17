@@ -2,6 +2,7 @@ package snippet
 
 import (
 	"fmt"
+	"os/exec"
 	"regexp"
 	"strings"
 
@@ -18,12 +19,17 @@ func (b *Bookmark) Type() SnippetType  { return BOOKMARK }
 func (b *Bookmark) Data() *SnippetData { return &b.data }
 
 func (b *Bookmark) Execute() error {
-	fmt.Println("Okay, opening link in default browser...")
+	br := viper.GetString("defaults.browser")
+	fmt.Printf("Okay, opening link in %s browser...\n", br)
 	url := b.data.Content
 	if matched, _ := regexp.MatchString("^http(s)?://*", url); !matched {
 		url = "http://" + url
 	}
-	browser.OpenURL(url)
+	if br == "default" {
+		browser.OpenURL(url)
+	} else {
+		openInBrowser(br, url)
+	}
 
 	return nil
 }
@@ -55,4 +61,10 @@ func NewBookmark(url, description string, tags string) *Bookmark {
 	}
 
 	return &bookmark
+}
+
+func openInBrowser(b, url string) {
+	var command *exec.Cmd
+	command = exec.Command(b, url)
+	command.Start()
 }

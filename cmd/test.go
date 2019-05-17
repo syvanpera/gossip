@@ -29,6 +29,7 @@ var (
 	testCmd = &cobra.Command{
 		Use:   "test",
 		Short: "Testing",
+		Run:   test,
 	}
 
 	testEditCmd = &cobra.Command{
@@ -73,6 +74,7 @@ Type: {{.Type}}{{if .Language}}Language: {{.Language}}{{end}}
 `
 
 func test(cmd *cobra.Command, args []string) {
+	fmt.Println(viper.GetString("defaults.browser"))
 }
 
 func testEdit(cmd *cobra.Command, args []string) {

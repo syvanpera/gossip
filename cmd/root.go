@@ -45,10 +45,13 @@ func initConfig() {
 		viper.AddConfigPath("$HOME/.config/gossip")
 	}
 
+	viper.AutomaticEnv()
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(err)
+	}
+
 	viper.SetDefault("database", "gossip.db")
 	viper.SetDefault("defaults.color", true)
 	viper.SetDefault("defaults.browser", "default")
-
-	viper.AutomaticEnv()
-	viper.ReadInConfig()
 }
