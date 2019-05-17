@@ -29,7 +29,7 @@ var (
 	}
 
 	listCodeCmd = &cobra.Command{
-		Use:   "code CODE",
+		Use:   "code",
 		Short: "List code snippets",
 		Long:  `List code snippets`,
 		Args:  cobra.NoArgs,
@@ -39,8 +39,8 @@ var (
 	}
 
 	listBookmarkCmd = &cobra.Command{
-		Use:     "url SNIPPET",
-		Aliases: []string{"bookmark", "bm"},
+		Use:     "url",
+		Aliases: []string{"u", "bookmark", "bm", "b"},
 		Short:   "List bookmarks",
 		Long:    `List bookmarks`,
 		Run: func(_ *cobra.Command, _ []string) {

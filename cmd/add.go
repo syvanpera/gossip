@@ -19,10 +19,10 @@ var tagsFlag string
 var (
 	addCmd = &cobra.Command{
 		Use:     "add",
-		Aliases: []string{"new", "a"},
+		Aliases: []string{"a", "new", "n"},
 		Short:   "Add a new snippet",
 		Long:    `Add a new snippet"`,
-		Args:    cobra.MinimumNArgs(1),
+		Args:    cobra.MaximumNArgs(2),
 		Run:     add,
 	}
 
@@ -54,9 +54,11 @@ var (
 )
 
 func add(cmd *cobra.Command, args []string) {
-	if matched, _ := regexp.MatchString("^https?://*", args[0]); matched {
-		addBookmark(cmd, args)
-		return
+	if len(args) > 0 {
+		if matched, _ := regexp.MatchString("^https?://*", args[0]); matched {
+			addBookmark(cmd, args)
+			return
+		}
 	}
 
 	prompt := promptui.Select{

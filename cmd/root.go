@@ -42,6 +42,7 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 	} else {
 		viper.SetConfigName("config")
+		viper.AddConfigPath(".")
 		viper.AddConfigPath("$HOME/.config/gossip")
 	}
 
