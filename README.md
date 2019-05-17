@@ -15,3 +15,7 @@ Inspired by
 * Copying snippet contents to the clipboard
 * Automatically fetches description and tags for bookmarks from the HTML in the
   page or from Github API (in case of links pointing to github repos)
+
+## Demo
+
+<img src="demo.gif" width="700">
