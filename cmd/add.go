@@ -24,7 +24,7 @@ var (
 
 	addCommandCmd = &cobra.Command{
 		Use:     "cmd",
-		Aliases: []string{"command"},
+		Aliases: []string{"command", "c"},
 		Short:   "Add a new command snippet",
 		Long:    `Add a new command snippet`,
 		Args:    cobra.MaximumNArgs(2),
@@ -32,16 +32,17 @@ var (
 	}
 
 	addCodeCmd = &cobra.Command{
-		Use:   "code CODE",
-		Short: "Add a new code snippet",
-		Long:  `Add a new code snippet`,
-		Args:  cobra.MaximumNArgs(1),
-		Run:   addCode,
+		Use:     "code",
+		Aliases: []string{"d"},
+		Short:   "Add a new code snippet",
+		Long:    `Add a new code snippet`,
+		Args:    cobra.MaximumNArgs(1),
+		Run:     addCode,
 	}
 
 	addBookmarkCmd = &cobra.Command{
-		Use:     "url SNIPPET",
-		Aliases: []string{"bookmark", "bm"},
+		Use:     "url",
+		Aliases: []string{"u", "bookmark", "bm", "b"},
 		Short:   "Add a new bookmark",
 		Long:    `Add a new bookmark`,
 		Args:    cobra.MaximumNArgs(2),

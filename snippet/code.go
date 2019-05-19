@@ -100,18 +100,14 @@ func (c *Code) Execute() error {
 	return ErrNotExecutable
 }
 
-func (c *Code) Edit(content, description string) error {
-	if content == "" {
-		content = c.Data().Content
-	}
+func (c *Code) Edit() error {
+	content := c.Data().Content
 	if content = ui.Editor(content); content == "" {
 		return ErrEditCanceled
 	}
 	c.Data().Content = content
 
-	if description == "" {
-		description = c.Data().Description
-	}
+	description := c.Data().Description
 	if description = ui.Prompt("Description", c.Data().Description); description == "" {
 		return ErrEditCanceled
 	}

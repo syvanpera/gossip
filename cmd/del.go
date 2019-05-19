@@ -14,7 +14,7 @@ var force bool
 
 var delCmd = &cobra.Command{
 	Use:     "del",
-	Aliases: []string{"rm"},
+	Aliases: []string{"rm", "d"},
 	Short:   "Delete a snippet",
 	Long:    `Delete a snippet`,
 	Args: func(cmd *cobra.Command, args []string) error {

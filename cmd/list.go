@@ -19,7 +19,7 @@ var (
 
 	listCommandCmd = &cobra.Command{
 		Use:     "cmd",
-		Aliases: []string{"command"},
+		Aliases: []string{"command", "c"},
 		Short:   "List command snippets",
 		Long:    `List command snippets`,
 		Args:    cobra.NoArgs,
@@ -29,10 +29,11 @@ var (
 	}
 
 	listCodeCmd = &cobra.Command{
-		Use:   "code",
-		Short: "List code snippets",
-		Long:  `List code snippets`,
-		Args:  cobra.NoArgs,
+		Use:     "code",
+		Aliases: []string{"d"},
+		Short:   "List code snippets",
+		Long:    `List code snippets`,
+		Args:    cobra.NoArgs,
 		Run: func(_ *cobra.Command, _ []string) {
 			list(snippet.CODE)
 		},

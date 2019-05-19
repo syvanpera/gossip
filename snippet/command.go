@@ -36,18 +36,14 @@ func (c *Command) Execute() error {
 	return nil
 }
 
-func (c *Command) Edit(content, description string) error {
-	if content == "" {
-		content = c.Data().Content
-	}
+func (c *Command) Edit() error {
+	content := c.Data().Content
 	if content = ui.Prompt("URL", content); content == "" {
 		return ErrEditCanceled
 	}
 	c.Data().Content = content
 
-	if description == "" {
-		description = c.Data().Description
-	}
+	description := c.Data().Description
 	if description = ui.Prompt("Description", c.Data().Description); description == "" {
 		return ErrEditCanceled
 	}
