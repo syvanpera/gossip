@@ -11,6 +11,7 @@ import (
 	"github.com/logrusorgru/aurora"
 	"github.com/mattn/go-runewidth"
 	"github.com/spf13/viper"
+	"github.com/syvanpera/gossip/ui"
 	"github.com/syvanpera/gossip/util"
 )
 
@@ -100,7 +101,22 @@ func (c *Code) Execute() error {
 }
 
 func (c *Code) Edit(content, description string) error {
-	fmt.Println("Edit code ", c)
+	if content == "" {
+		content = c.Data().Content
+	}
+	if content = ui.Editor(content); content == "" {
+		return ErrEditCanceled
+	}
+	c.Data().Content = content
+
+	if description == "" {
+		description = c.Data().Description
+	}
+	if description = ui.Prompt("Description", c.Data().Description); description == "" {
+		return ErrEditCanceled
+	}
+	c.Data().Description = description
+
 	return nil
 }
 

@@ -1,0 +1,5 @@
+database = "gossip.db"
+
+[defaults]
+browser = "default"
+color = true

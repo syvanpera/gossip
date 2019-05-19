@@ -2,10 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
-	"log"
-	"os"
-	"os/exec"
 	"regexp"
 
 	"github.com/spf13/cobra"
@@ -122,7 +118,7 @@ func addCode(_ *cobra.Command, args []string) {
 	}
 
 	content := ""
-	if content = fromEditor(); content == "" {
+	if content = ui.Editor(""); content == "" {
 		fmt.Println("Canceled")
 		return
 	}
@@ -176,34 +172,6 @@ func addBookmark(_ *cobra.Command, args []string) {
 	snippet.NewRepository().Add(bookmark)
 
 	fmt.Printf("Bookmark added\n%s", bookmark.String())
-}
-
-func fromEditor() string {
-	fpath := os.TempDir() + "/gossip.tmp"
-	f, err := os.Create(fpath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	f.Close()
-
-	editor, _ := exec.LookPath(os.Getenv("EDITOR"))
-
-	command := exec.Command(editor, fpath)
-	command.Stdin = os.Stdin
-	command.Stdout = os.Stdout
-	command.Stderr = os.Stderr
-	if err = command.Start(); err != nil {
-		return ""
-	}
-	if err = command.Wait(); err != nil {
-		return ""
-	}
-
-	data, err := ioutil.ReadFile(fpath)
-	if err != nil {
-		return ""
-	}
-	return string(data)
 }
 
 func init() {

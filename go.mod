@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/alecthomas/chroma v0.6.3
+	github.com/alecthomas/gometalinter v3.0.0+incompatible // indirect
 	github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e
 	github.com/google/go-github/v25 v25.0.4
