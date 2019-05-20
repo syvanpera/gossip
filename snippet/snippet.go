@@ -3,6 +3,8 @@ package snippet
 import (
 	"errors"
 	"fmt"
+
+	"github.com/syvanpera/gossip/ui"
 )
 
 const (
@@ -16,7 +18,7 @@ var ErrNotExecutable = errors.New("not executable")
 var ErrExecCanceled = errors.New("execution canceled")
 var ErrEditCanceled = errors.New("edit canceled")
 
-// SnippetData contains the data for one snippet
+// SnippetData contains the data for a snippet
 type SnippetData struct {
 	ID          int64
 	Content     string
@@ -60,4 +62,20 @@ func New(sd SnippetData) Snippet {
 	}
 
 	return nil
+}
+
+func Edit(label, s string) (string, error) {
+	if s = ui.Prompt(label, s); s == "" {
+		return "", ErrEditCanceled
+	}
+
+	return s, nil
+}
+
+func Editor(s string) (string, error) {
+	if s = ui.Editor(s); s == "" {
+		return "", ErrEditCanceled
+	}
+
+	return s, nil
 }

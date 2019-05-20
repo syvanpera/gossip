@@ -37,17 +37,17 @@ func (c *Command) Execute() error {
 }
 
 func (c *Command) Edit() error {
-	content := c.Data().Content
-	if content = ui.Prompt("URL", content); content == "" {
-		return ErrEditCanceled
+	s, err := Edit("Command", c.Data().Content)
+	if err != nil {
+		return err
 	}
-	c.Data().Content = content
+	c.Data().Content = s
 
-	description := c.Data().Description
-	if description = ui.Prompt("Description", c.Data().Description); description == "" {
-		return ErrEditCanceled
+	s, err = Edit("Description", c.Data().Description)
+	if err != nil {
+		return err
 	}
-	c.Data().Description = description
+	c.Data().Description = s
 
 	return nil
 }

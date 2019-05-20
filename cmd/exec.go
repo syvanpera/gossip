@@ -11,7 +11,7 @@ import (
 
 var execCmd = &cobra.Command{
 	Use:     "exec",
-	Aliases: []string{"run"},
+	Aliases: []string{"x", "run"},
 	Short:   "Execute a command snippet",
 	Long:    `Execute a command snippet`,
 	Args: func(cmd *cobra.Command, args []string) error {

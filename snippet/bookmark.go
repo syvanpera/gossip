@@ -9,7 +9,6 @@ import (
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/browser"
 	"github.com/spf13/viper"
-	"github.com/syvanpera/gossip/ui"
 )
 
 type Bookmark struct {
@@ -21,32 +20,34 @@ func (b *Bookmark) Data() *SnippetData { return &b.data }
 
 func (b *Bookmark) Execute() error {
 	br := viper.GetString("defaults.browser")
-	fmt.Printf("Okay, opening link in %s browser...\n", br)
 	url := b.data.Content
 	if matched, _ := regexp.MatchString("^http(s)?://*", url); !matched {
 		url = "http://" + url
 	}
-	if br == "default" {
-		browser.OpenURL(url)
+	if _, err := exec.LookPath(br); err == nil {
+		fmt.Printf("Okay, opening link in %s...\n", br)
+		command := exec.Command(br, url)
+		command.Start()
 	} else {
-		openInBrowser(br, url)
+		fmt.Println("Okay, opening link in default browser...")
+		browser.OpenURL(url)
 	}
 
 	return nil
 }
 
 func (b *Bookmark) Edit() error {
-	content := b.Data().Content
-	if content = ui.Prompt("URL", content); content == "" {
-		return ErrEditCanceled
+	s, err := Edit("URL", b.Data().Content)
+	if err != nil {
+		return err
 	}
-	b.Data().Content = content
+	b.Data().Content = s
 
-	description := b.Data().Description
-	if description = ui.Prompt("Description", b.Data().Description); description == "" {
-		return ErrEditCanceled
+	s, err = Edit("Description", b.Data().Description)
+	if err != nil {
+		return err
 	}
-	b.Data().Description = description
+	b.Data().Description = s
 
 	return nil
 }
@@ -78,10 +79,4 @@ func NewBookmark(url, description string, tags string) Bookmark {
 	}
 
 	return bookmark
-}
-
-func openInBrowser(b, url string) {
-	var command *exec.Cmd
-	command = exec.Command(b, url)
-	command.Start()
 }
