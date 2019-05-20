@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/syvanpera/gossip/snippet"
+	"github.com/syvanpera/gossip/util"
 )
 
 var addTags string
@@ -52,7 +53,7 @@ func edit(_ *cobra.Command, args []string) {
 
 	for _, t := range tags {
 		tag := strings.ToLower(t)
-		if !contains(existingTags, tag) {
+		if !util.Contains(existingTags, tag) {
 			newTags = append(newTags, tag)
 		}
 	}
@@ -60,16 +61,6 @@ func edit(_ *cobra.Command, args []string) {
 	r.Save(s)
 
 	fmt.Println(s)
-}
-
-func contains(ss []string, s string) bool {
-	for _, x := range ss {
-		if x == s {
-			return true
-		}
-	}
-
-	return false
 }
 
 func init() {

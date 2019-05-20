@@ -149,7 +149,7 @@ func (c *Code) String() string {
 	return output.String()
 }
 
-func NewCode(content, description string, tags string, language string) *Code {
+func NewCode(content, description string, tags string, language string) Code {
 	cmd := Code{
 		data: SnippetData{
 			Content:     content,
@@ -160,5 +160,5 @@ func NewCode(content, description string, tags string, language string) *Code {
 		},
 	}
 
-	return &cmd
+	return cmd
 }

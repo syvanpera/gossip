@@ -68,7 +68,7 @@ func (c *Command) String() string {
 	return output.String()
 }
 
-func NewCommand(content, description string, tags string) *Command {
+func NewCommand(content, description string, tags string) Command {
 	cmd := Command{
 		data: SnippetData{
 			Content:     content,
@@ -78,5 +78,5 @@ func NewCommand(content, description string, tags string) *Command {
 		},
 	}
 
-	return &cmd
+	return cmd
 }

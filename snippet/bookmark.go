@@ -67,7 +67,7 @@ func (b *Bookmark) String() string {
 	return output.String()
 }
 
-func NewBookmark(url, description string, tags string) *Bookmark {
+func NewBookmark(url, description string, tags string) Bookmark {
 	bookmark := Bookmark{
 		data: SnippetData{
 			Content:     url,
@@ -77,7 +77,7 @@ func NewBookmark(url, description string, tags string) *Bookmark {
 		},
 	}
 
-	return &bookmark
+	return bookmark
 }
 
 func openInBrowser(b, url string) {

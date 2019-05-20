@@ -75,65 +75,6 @@ func add(cmd *cobra.Command, args []string) {
 	}
 }
 
-func addCommand(_ *cobra.Command, args []string) {
-	tags := tagsFlag
-	content := ""
-	if len(args) > 0 {
-		content = args[0]
-	}
-	// TODO Refactor to use the Edit method from the Snippet
-	if content == "" {
-		if content = ui.Prompt("Command", ""); content == "" {
-			fmt.Println("Canceled")
-			return
-		}
-	}
-
-	description := ""
-	if len(args) > 1 {
-		description = args[1]
-	}
-	if description == "" {
-		if description = ui.Prompt("Description", ""); description == "" {
-			fmt.Println("Canceled")
-			return
-		}
-	}
-
-	command := snippet.NewCommand(content, description, tags)
-	snippet.NewRepository().Add(command)
-
-	fmt.Printf("Command added\n%s", command.String())
-}
-
-func addCode(_ *cobra.Command, args []string) {
-	description := ""
-	if len(args) > 0 {
-		description = args[0]
-	}
-	if description == "" {
-		if description = ui.Prompt("Description", ""); description == "" {
-			fmt.Println("Canceled")
-			return
-		}
-	}
-
-	content := ""
-	if content = ui.Editor(""); content == "" {
-		fmt.Println("Canceled")
-		return
-	}
-
-	language := ui.Prompt("Language", "")
-
-	tags := tagsFlag
-
-	code := snippet.NewCode(content, description, tags, language)
-	snippet.NewRepository().Add(code)
-
-	fmt.Printf("Code snippet added\n%s", code.String())
-}
-
 func addBookmark(_ *cobra.Command, args []string) {
 	content := ""
 	if len(args) > 0 {
@@ -170,9 +111,68 @@ func addBookmark(_ *cobra.Command, args []string) {
 	}
 
 	bookmark := snippet.NewBookmark(content, description, tags)
-	snippet.NewRepository().Add(bookmark)
+	snippet.NewRepository().Add(&bookmark)
 
 	fmt.Printf("Bookmark added\n%s", bookmark.String())
+}
+
+func addCommand(_ *cobra.Command, args []string) {
+	tags := tagsFlag
+	content := ""
+	if len(args) > 0 {
+		content = args[0]
+	}
+	// TODO Refactor to use the Edit method from the Snippet
+	if content == "" {
+		if content = ui.Prompt("Command", ""); content == "" {
+			fmt.Println("Canceled")
+			return
+		}
+	}
+
+	description := ""
+	if len(args) > 1 {
+		description = args[1]
+	}
+	if description == "" {
+		if description = ui.Prompt("Description", ""); description == "" {
+			fmt.Println("Canceled")
+			return
+		}
+	}
+
+	command := snippet.NewCommand(content, description, tags)
+	snippet.NewRepository().Add(&command)
+
+	fmt.Printf("Command added\n%s", command.String())
+}
+
+func addCode(_ *cobra.Command, args []string) {
+	description := ""
+	if len(args) > 0 {
+		description = args[0]
+	}
+	if description == "" {
+		if description = ui.Prompt("Description", ""); description == "" {
+			fmt.Println("Canceled")
+			return
+		}
+	}
+
+	content := ""
+	if content = ui.Editor(""); content == "" {
+		fmt.Println("Canceled")
+		return
+	}
+
+	language := ui.Prompt("Language", "")
+
+	tags := tagsFlag
+
+	code := snippet.NewCode(content, description, tags, language)
+	snippet.NewRepository().Add(&code)
+
+	fmt.Printf("Code snippet added\n%s", code.String())
 }
 
 func init() {
