@@ -41,7 +41,8 @@ func del(cmd *cobra.Command, args []string) {
 
 	fmt.Println(s)
 
-	if !ui.Confirm("Are you sure you want to delete this snippet") {
+	if !force && !ui.Confirm("Are you sure you want to delete this snippet") {
+		fmt.Println("Canceled")
 		return
 	}
 
