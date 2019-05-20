@@ -10,7 +10,7 @@ import (
 	"github.com/syvanpera/gossip/ui"
 )
 
-var tagsFlag string
+var tags string
 
 var (
 	addCmd = &cobra.Command{
@@ -59,9 +59,7 @@ func add(cmd *cobra.Command, args []string) {
 	}
 
 	choice, err := ui.Choose("Add what", []string{"Bookmark", "Command", "Code snippet"})
-
 	if err != nil {
-		fmt.Println("Canceled")
 		return
 	}
 
@@ -76,103 +74,123 @@ func add(cmd *cobra.Command, args []string) {
 }
 
 func addBookmark(_ *cobra.Command, args []string) {
-	content := ""
-	if len(args) > 0 {
-		content = args[0]
+	data := snippet.SnippetData{
+		Content:     "",
+		Description: "",
+		Tags:        tags,
+		Language:    "",
+		Type:        snippet.COMMAND,
 	}
 
-	if content == "" {
-		if content = ui.Prompt("URL", ""); content == "" {
-			fmt.Println("Canceled")
-			return
-		}
+	data.Content = resolveContent("URL", args)
+	if data.Content == "" {
+		return
 	}
 
-	if matched, _ := regexp.MatchString("^https?://*", content); !matched {
-		content = "http://" + content
+	if matched, _ := regexp.MatchString("^https?://*", data.Content); !matched {
+		data.Content = "http://" + data.Content
 	}
 
-	description := ""
 	if len(args) > 1 {
-		description = args[1]
+		data.Description = args[1]
 	}
-
-	tags := tagsFlag
-
-	if description == "" || tags == "" {
-		if meta := meta.Extract(content); meta != nil {
-			if description == "" {
-				description = meta.Description
+	if data.Description == "" || data.Tags == "" {
+		if meta := meta.Extract(data.Content); meta != nil {
+			if data.Description == "" {
+				data.Description = meta.Description
 			}
-			if tags == "" {
-				tags = meta.Tags
+			if data.Tags == "" {
+				data.Tags = meta.Tags
 			}
 		}
 	}
 
-	bookmark := snippet.NewBookmark(content, description, tags)
-	snippet.NewRepository().Add(&bookmark)
+	s := snippet.New(data)
+	snippet.NewRepository().Add(s)
 
-	fmt.Printf("Bookmark added\n%s", bookmark.String())
+	fmt.Printf("Bookmark added\n%s", s.String())
 }
 
 func addCommand(_ *cobra.Command, args []string) {
-	tags := tagsFlag
-	content := ""
-	if len(args) > 0 {
-		content = args[0]
-	}
-	// TODO Refactor to use the Edit method from the Snippet
-	if content == "" {
-		if content = ui.Prompt("Command", ""); content == "" {
-			fmt.Println("Canceled")
-			return
-		}
+	data := snippet.SnippetData{
+		Content:     "",
+		Description: "",
+		Tags:        tags,
+		Language:    "",
+		Type:        snippet.COMMAND,
 	}
 
-	description := ""
+	data.Content = resolveContent("Command", args)
+	if data.Content == "" {
+		return
+	}
+
 	if len(args) > 1 {
-		description = args[1]
+		data.Description = args[1]
 	}
-	if description == "" {
-		if description = ui.Prompt("Description", ""); description == "" {
-			fmt.Println("Canceled")
+	if data.Description == "" {
+		var err error
+		data.Description, err = snippet.Edit("Description", data.Description)
+		if err != nil {
+			fmt.Println(err)
 			return
 		}
 	}
 
-	command := snippet.NewCommand(content, description, tags)
-	snippet.NewRepository().Add(&command)
+	s := snippet.New(data)
+	snippet.NewRepository().Add(s)
 
-	fmt.Printf("Command added\n%s", command.String())
+	fmt.Printf("Command added\n%s", s.String())
 }
 
 func addCode(_ *cobra.Command, args []string) {
-	description := ""
-	if len(args) > 0 {
-		description = args[0]
+	data := snippet.SnippetData{
+		Content:     "",
+		Description: "",
+		Tags:        tags,
+		Language:    "",
+		Type:        snippet.CODE,
 	}
-	if description == "" {
-		if description = ui.Prompt("Description", ""); description == "" {
+
+	if len(args) > 0 {
+		data.Description = args[0]
+	}
+	if data.Description == "" {
+		if data.Description = ui.Prompt("Description", ""); data.Description == "" {
 			fmt.Println("Canceled")
 			return
 		}
 	}
 
-	content := ""
-	if content = ui.Editor(""); content == "" {
+	if data.Content = ui.Editor(""); data.Content == "" {
 		fmt.Println("Canceled")
 		return
 	}
 
-	language := ui.Prompt("Language", "")
+	data.Language = ui.Prompt("Language", "")
 
-	tags := tagsFlag
+	s := snippet.New(data)
+	snippet.NewRepository().Add(s)
 
-	code := snippet.NewCode(content, description, tags, language)
-	snippet.NewRepository().Add(&code)
+	fmt.Printf("Code snippet added\n%s", s.String())
+}
 
-	fmt.Printf("Code snippet added\n%s", code.String())
+func resolveContent(label string, args []string) string {
+	content := ""
+	if len(args) > 0 {
+		content = args[0]
+	}
+
+	if content == "" {
+		var err error
+		content, err = snippet.Edit(label, content)
+		if err != nil {
+			fmt.Println(err)
+			return ""
+		}
+	}
+
+	return content
 }
 
 func init() {
@@ -181,5 +199,5 @@ func init() {
 	addCmd.AddCommand(addBookmarkCmd)
 	rootCmd.AddCommand(addCmd)
 
-	addCmd.PersistentFlags().StringVarP(&tagsFlag, "tags", "t", "", "tags")
+	addCmd.PersistentFlags().StringVarP(&tags, "tags", "t", "", "tags")
 }

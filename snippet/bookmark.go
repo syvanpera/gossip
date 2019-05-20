@@ -67,16 +67,3 @@ func (b *Bookmark) String() string {
 
 	return output.String()
 }
-
-func NewBookmark(url, description string, tags string) Bookmark {
-	bookmark := Bookmark{
-		data: SnippetData{
-			Content:     url,
-			Description: description,
-			Tags:        strings.ToLower(tags),
-			Type:        BOOKMARK,
-		},
-	}
-
-	return bookmark
-}

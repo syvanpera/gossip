@@ -50,7 +50,7 @@ var (
 	}
 )
 
-var tags, language string
+var tagFilter, languageFilter string
 
 func listDefault(_ *cobra.Command, _ []string) {
 	choice, err := ui.Choose("List what", []string{"Bookmarks", "Commands", "Code snippets"})
@@ -72,11 +72,11 @@ func listDefault(_ *cobra.Command, _ []string) {
 
 func list(t snippet.SnippetType) {
 	filters := snippet.Filters{
-		Language: language,
+		Language: languageFilter,
 		Type:     t,
 	}
 	if tags != "" {
-		filters.Tags = tags
+		filters.Tags = tagFilter
 	}
 
 	r := snippet.NewRepository()
@@ -93,6 +93,6 @@ func init() {
 	listCmd.AddCommand(listBookmarkCmd)
 	rootCmd.AddCommand(listCmd)
 
-	listCmd.PersistentFlags().StringVarP(&tags, "tags", "t", "", "Tags filter (comma separated)")
-	listCodeCmd.Flags().StringVarP(&language, "language", "l", "", "Language filter")
+	listCmd.PersistentFlags().StringVarP(&tagFilter, "tags", "t", "", "Tags filter (comma separated)")
+	listCodeCmd.Flags().StringVarP(&languageFilter, "language", "l", "", "Language filter")
 }

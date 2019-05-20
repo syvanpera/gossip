@@ -49,16 +49,16 @@ func (f Filters) String() string {
 	return fmt.Sprintf("{Type: \"%s\", Language: \"%s\", Tags: \"%s\"}", f.Type, f.Language, f.Tags)
 }
 
-func New(sd SnippetData) Snippet {
-	switch sd.Type {
+func New(data SnippetData) Snippet {
+	switch data.Type {
 	case COMMAND:
-		return &Command{data: sd}
+		return &Command{data: data}
 
 	case CODE:
-		return &Code{data: sd}
+		return &Code{data: data}
 
 	case BOOKMARK:
-		return &Bookmark{data: sd}
+		return &Bookmark{data: data}
 	}
 
 	return nil

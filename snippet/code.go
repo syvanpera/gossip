@@ -147,17 +147,3 @@ func (c *Code) String() string {
 
 	return output.String()
 }
-
-func NewCode(content, description string, tags string, language string) Code {
-	cmd := Code{
-		data: SnippetData{
-			Content:     content,
-			Description: description,
-			Tags:        strings.ToLower(tags),
-			Language:    strings.ToLower(language),
-			Type:        CODE,
-		},
-	}
-
-	return cmd
-}

@@ -74,15 +74,15 @@ func (r *Repository) Save(s Snippet) {
 
 // Get returns a snippet with the given ID
 func (r *Repository) Get(id int) Snippet {
-	var s SnippetData
-	err := r.db.Get(&s, "SELECT * FROM snippets WHERE id = $1", id)
+	var data SnippetData
+	err := r.db.Get(&data, "SELECT * FROM snippets WHERE id = $1", id)
 	if err == sql.ErrNoRows {
 		return nil
 	} else if err != nil {
 		panic(err)
 	}
 
-	return New(s)
+	return New(data)
 }
 
 // FindWithFilters returns snippets that match the given filters
@@ -114,11 +114,11 @@ func (r *Repository) FindWithFilters(filters Filters) []Snippet {
 
 	var ss []Snippet
 	for rows.Next() {
-		var s SnippetData
-		if err := rows.StructScan(&s); err != nil {
+		var data SnippetData
+		if err := rows.StructScan(&data); err != nil {
 			panic(err)
 		}
-		ss = append(ss, New(s))
+		ss = append(ss, New(data))
 	}
 
 	return ss

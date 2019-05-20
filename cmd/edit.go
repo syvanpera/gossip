@@ -42,7 +42,7 @@ func edit(_ *cobra.Command, args []string) {
 
 	if addTags == "" {
 		if err := s.Edit(); err != nil {
-			fmt.Println("Canceled")
+			fmt.Println(err)
 			return
 		}
 	}
