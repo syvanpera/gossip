@@ -9,18 +9,27 @@ import (
 	"github.com/spf13/viper"
 	"github.com/syvanpera/gossip/util"
 
-	// bring in the sqlite3 driver
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// Repository is the main accessor for snippets in the DB
-type Repository struct {
+type Repository interface {
+	Add(Snippet)
+	Save(Snippet)
+	Get(int) Snippet
+	FindWithFilters(Filters) []Snippet
+	Del(int)
+}
+
+type repository struct {
 	db *sqlx.DB
 }
 
-// NewRepository returns a new snippet resository
-func NewRepository() *Repository {
-	return &Repository{db: openDB(viper.GetString("database"))}
+// func NewRepository(db *sqlx.DB) Repository {
+// 	return &repository{db: db}
+// }
+
+func NewRepository() Repository {
+	return &repository{db: openDB(viper.GetString("database"))}
 }
 
 func openDB(file string) *sqlx.DB {
@@ -42,8 +51,7 @@ func openDB(file string) *sqlx.DB {
 	return db
 }
 
-// Add a new snippet to the database
-func (r *Repository) Add(s Snippet) {
+func (r *repository) Add(s Snippet) {
 	sd := s.Data()
 	query := `
 		INSERT INTO snippets (content, description, tags, type, language)
@@ -60,8 +68,7 @@ func (r *Repository) Add(s Snippet) {
 	}
 }
 
-// Save an existing snippet to the database
-func (r *Repository) Save(s Snippet) {
+func (r *repository) Save(s Snippet) {
 	sd := s.Data()
 	query := `
 		UPDATE snippets SET
@@ -72,8 +79,7 @@ func (r *Repository) Save(s Snippet) {
 	}
 }
 
-// Get returns a snippet with the given ID
-func (r *Repository) Get(id int) Snippet {
+func (r *repository) Get(id int) Snippet {
 	var data SnippetData
 	err := r.db.Get(&data, "SELECT * FROM snippets WHERE id = $1", id)
 	if err == sql.ErrNoRows {
@@ -85,8 +91,7 @@ func (r *Repository) Get(id int) Snippet {
 	return New(data)
 }
 
-// FindWithFilters returns snippets that match the given filters
-func (r *Repository) FindWithFilters(filters Filters) []Snippet {
+func (r *repository) FindWithFilters(filters Filters) []Snippet {
 	var wheres []string
 	if filters.Type != "" {
 		wheres = append(wheres, fmt.Sprintf("type = \"%s\"", filters.Type))
@@ -124,7 +129,6 @@ func (r *Repository) FindWithFilters(filters Filters) []Snippet {
 	return ss
 }
 
-// Del removes a snippet with the given ID
-func (r *Repository) Del(id int) {
+func (r *repository) Del(id int) {
 	r.db.MustExec("DELETE FROM snippets WHERE id = $1", id)
 }
