@@ -5,7 +5,6 @@ import (
 	"regexp"
 
 	"github.com/spf13/cobra"
-	"github.com/syvanpera/gossip/meta"
 	"github.com/syvanpera/gossip/snippet"
 	"github.com/syvanpera/gossip/ui"
 )
@@ -16,8 +15,8 @@ var (
 	addCmd = &cobra.Command{
 		Use:     "add",
 		Aliases: []string{"a", "new", "n"},
-		Short:   "Add a new snippet",
-		Long:    `Add a new snippet"`,
+		Short:   "Create a new snippet",
+		Long:    `Create a new snippet"`,
 		Args:    cobra.MaximumNArgs(2),
 		Run:     add,
 	}
@@ -25,8 +24,8 @@ var (
 	addCommandCmd = &cobra.Command{
 		Use:     "cmd",
 		Aliases: []string{"command", "c"},
-		Short:   "Add a new command snippet",
-		Long:    `Add a new command snippet`,
+		Short:   "Create a new command snippet",
+		Long:    `Create a new command snippet`,
 		Args:    cobra.MaximumNArgs(2),
 		Run:     addCommand,
 	}
@@ -34,8 +33,8 @@ var (
 	addCodeCmd = &cobra.Command{
 		Use:     "code",
 		Aliases: []string{"d"},
-		Short:   "Add a new code snippet",
-		Long:    `Add a new code snippet`,
+		Short:   "Create a new code snippet",
+		Long:    `Create a new code snippet`,
 		Args:    cobra.MaximumNArgs(1),
 		Run:     addCode,
 	}
@@ -43,12 +42,14 @@ var (
 	addBookmarkCmd = &cobra.Command{
 		Use:     "url",
 		Aliases: []string{"u", "bookmark", "bm", "b"},
-		Short:   "Add a new bookmark",
-		Long:    `Add a new bookmark`,
+		Short:   "Create a new bookmark",
+		Long:    `Create a new bookmark`,
 		Args:    cobra.MaximumNArgs(2),
 		Run:     addBookmark,
 	}
 )
+
+var service = snippet.NewService(snippet.NewSQLiteRepository())
 
 func add(cmd *cobra.Command, args []string) {
 	if len(args) > 0 {
@@ -58,7 +59,7 @@ func add(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	choice, err := ui.Choose("Add what", []string{"Bookmark", "Command", "Code snippet"})
+	choice, err := ui.Choose("Create what", []string{"Bookmark", "Command", "Code snippet"})
 	if err != nil {
 		return
 	}
@@ -74,103 +75,56 @@ func add(cmd *cobra.Command, args []string) {
 }
 
 func addBookmark(_ *cobra.Command, args []string) {
-	data := snippet.SnippetData{
-		Content:     "",
-		Description: "",
-		Tags:        tags,
-		Language:    "",
-		Type:        snippet.COMMAND,
+	content := ""
+	if len(args) > 0 {
+		content = args[0]
 	}
 
-	data.Content = resolveContent("URL", args)
-	if data.Content == "" {
+	description := ""
+	if len(args) > 1 {
+		description = args[1]
+	}
+
+	s, err := service.AddBookmark(content, description, tags)
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
-
-	if matched, _ := regexp.MatchString("^https?://*", data.Content); !matched {
-		data.Content = "http://" + data.Content
-	}
-
-	if len(args) > 1 {
-		data.Description = args[1]
-	}
-	if data.Description == "" || data.Tags == "" {
-		if meta := meta.Extract(data.Content); meta != nil {
-			if data.Description == "" {
-				data.Description = meta.Description
-			}
-			if data.Tags == "" {
-				data.Tags = meta.Tags
-			}
-		}
-	}
-
-	s := snippet.New(data)
-	snippet.NewRepository().Add(s)
 
 	fmt.Printf("Bookmark added\n%s", s.String())
 }
 
 func addCommand(_ *cobra.Command, args []string) {
-	data := snippet.SnippetData{
-		Content:     "",
-		Description: "",
-		Tags:        tags,
-		Language:    "",
-		Type:        snippet.COMMAND,
+	content := ""
+	if len(args) > 0 {
+		content = args[0]
 	}
 
-	data.Content = resolveContent("Command", args)
-	if data.Content == "" {
+	description := ""
+	if len(args) > 1 {
+		description = args[1]
+	}
+
+	s, err := service.AddCommand(content, description, tags)
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
-
-	if len(args) > 1 {
-		data.Description = args[1]
-	}
-	if data.Description == "" {
-		var err error
-		data.Description, err = snippet.Edit("Description", data.Description)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	}
-
-	s := snippet.New(data)
-	snippet.NewRepository().Add(s)
 
 	fmt.Printf("Command added\n%s", s.String())
 }
 
 func addCode(_ *cobra.Command, args []string) {
-	data := snippet.SnippetData{
-		Content:     "",
-		Description: "",
-		Tags:        tags,
-		Language:    "",
-		Type:        snippet.CODE,
-	}
-
+	description := ""
 	if len(args) > 0 {
-		data.Description = args[0]
-	}
-	if data.Description == "" {
-		if data.Description = ui.Prompt("Description", ""); data.Description == "" {
-			fmt.Println("Canceled")
-			return
-		}
+		description = args[0]
 	}
 
-	if data.Content = ui.Editor(""); data.Content == "" {
-		fmt.Println("Canceled")
+	s, err := service.AddCode("", description, tags)
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
-
-	data.Language = ui.Prompt("Language", "")
-
-	s := snippet.New(data)
-	snippet.NewRepository().Add(s)
 
 	fmt.Printf("Code snippet added\n%s", s.String())
 }

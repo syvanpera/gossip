@@ -32,9 +32,13 @@ var editCmd = &cobra.Command{
 
 func edit(_ *cobra.Command, args []string) {
 	id, _ := strconv.Atoi(args[0])
-	r := snippet.NewRepository()
+	r := snippet.NewSQLiteRepository()
 
-	s := r.Get(id)
+	s, err := r.Get(id)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	if s == nil {
 		fmt.Printf("Snippet with ID %d not found\n", id)
 		return
@@ -58,7 +62,10 @@ func edit(_ *cobra.Command, args []string) {
 		}
 	}
 	s.Data().Tags = strings.Trim(strings.Join(newTags, ","), " ,")
-	r.Save(s)
+	if err := r.Update(s); err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	fmt.Println(s)
 }

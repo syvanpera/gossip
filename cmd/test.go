@@ -230,7 +230,7 @@ func testAdd(cmd *cobra.Command, args []string) {
 	}
 
 	fmt.Printf("You chose %s\n", result)
-	// snippets := snippet.NewRepository()
+	// snippets := snippet.NewSQLiteRepository()
 	// newSnippet := snippet.Snippet{
 	// 	Snippet:     "ls -la",
 	// 	Description: "Lists the contents of a directory",

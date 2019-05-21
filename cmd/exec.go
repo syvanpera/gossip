@@ -28,9 +28,13 @@ var execCmd = &cobra.Command{
 
 func execute(cmd *cobra.Command, args []string) {
 	id, _ := strconv.Atoi(args[0])
-	r := snippet.NewRepository()
+	r := snippet.NewSQLiteRepository()
 
-	s := r.Get(id)
+	s, err := r.Get(id)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	if s == nil {
 		fmt.Printf("snippet #%d not found\n", id)
 		return

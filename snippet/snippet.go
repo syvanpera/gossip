@@ -14,9 +14,11 @@ const (
 	SNIP     = "SNIP"
 )
 
-var ErrNotExecutable = errors.New("not executable")
-var ErrExecCanceled = errors.New("execution canceled")
-var ErrEditCanceled = errors.New("edit canceled")
+var (
+	ErrNotExecutable = errors.New("not executable")
+	ErrExecCanceled  = errors.New("execution canceled")
+	ErrEditCanceled  = errors.New("edit canceled")
+)
 
 // SnippetData contains the data for a snippet
 type SnippetData struct {
@@ -49,7 +51,7 @@ func (f Filters) String() string {
 	return fmt.Sprintf("{Type: \"%s\", Language: \"%s\", Tags: \"%s\"}", f.Type, f.Language, f.Tags)
 }
 
-func New(data SnippetData) Snippet {
+func NewSnippet(data SnippetData) Snippet {
 	switch data.Type {
 	case COMMAND:
 		return &Command{data: data}
