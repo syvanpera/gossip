@@ -4,11 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/syvanpera/gossip/snippet"
-	"github.com/syvanpera/gossip/util"
 )
 
 var addTags string
@@ -32,37 +29,9 @@ var editCmd = &cobra.Command{
 
 func edit(_ *cobra.Command, args []string) {
 	id, _ := strconv.Atoi(args[0])
-	r := snippet.NewSQLiteRepository()
 
-	s, err := r.Get(id)
+	s, err := service.UpdateSnippet(id, addTags)
 	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	if s == nil {
-		fmt.Printf("Snippet with ID %d not found\n", id)
-		return
-	}
-
-	if addTags == "" {
-		if err := s.Edit(); err != nil {
-			fmt.Println(err)
-			return
-		}
-	}
-
-	existingTags := strings.Split(s.Data().Tags, ",")
-	tags := strings.Split(addTags, ",")
-	newTags := existingTags
-
-	for _, t := range tags {
-		tag := strings.ToLower(t)
-		if !util.Contains(existingTags, tag) {
-			newTags = append(newTags, tag)
-		}
-	}
-	s.Data().Tags = strings.Trim(strings.Join(newTags, ","), " ,")
-	if err := r.Update(s); err != nil {
 		fmt.Println(err)
 		return
 	}

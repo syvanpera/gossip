@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/spf13/cobra"
-	"github.com/syvanpera/gossip/snippet"
 )
 
 var showCmd = &cobra.Command{
@@ -28,15 +27,10 @@ var showCmd = &cobra.Command{
 
 func show(cmd *cobra.Command, args []string) {
 	id, _ := strconv.Atoi(args[0])
-	r := snippet.NewSQLiteRepository()
 
-	s, err := r.Get(id)
+	s, err := service.GetSnippet(id)
 	if err != nil {
 		fmt.Println(err)
-		return
-	}
-	if s == nil {
-		fmt.Printf("Snippet with ID %d not found\n", id)
 		return
 	}
 

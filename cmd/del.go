@@ -7,7 +7,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/syvanpera/gossip/snippet"
-	"github.com/syvanpera/gossip/ui"
 )
 
 var force bool
@@ -31,26 +30,12 @@ var delCmd = &cobra.Command{
 
 func del(cmd *cobra.Command, args []string) {
 	id, _ := strconv.Atoi(args[0])
-	r := snippet.NewSQLiteRepository()
 
-	s, err := r.Get(id)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	if s == nil {
+	err := service.DeleteSnippet(id, force)
+	if err == snippet.ErrNotFound {
 		fmt.Printf("Snippet #%d not found\n", id)
 		return
-	}
-
-	fmt.Println(s)
-
-	if !force && !ui.Confirm("Are you sure you want to delete this snippet") {
-		fmt.Println("Canceled")
-		return
-	}
-
-	if err = r.Del(id); err != nil {
+	} else if err != nil {
 		fmt.Println(err)
 		return
 	}

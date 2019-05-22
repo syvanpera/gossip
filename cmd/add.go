@@ -5,7 +5,6 @@ import (
 	"regexp"
 
 	"github.com/spf13/cobra"
-	"github.com/syvanpera/gossip/snippet"
 	"github.com/syvanpera/gossip/ui"
 )
 
@@ -49,8 +48,6 @@ var (
 	}
 )
 
-var service = snippet.NewService(snippet.NewSQLiteRepository())
-
 func add(cmd *cobra.Command, args []string) {
 	if len(args) > 0 {
 		if matched, _ := regexp.MatchString("^https?://*", args[0]); matched {
@@ -85,7 +82,7 @@ func addBookmark(_ *cobra.Command, args []string) {
 		description = args[1]
 	}
 
-	s, err := service.AddBookmark(content, description, tags)
+	s, err := service.CreateBookmark(content, description, tags)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -105,7 +102,7 @@ func addCommand(_ *cobra.Command, args []string) {
 		description = args[1]
 	}
 
-	s, err := service.AddCommand(content, description, tags)
+	s, err := service.CreateCommand(content, description, tags)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -120,31 +117,13 @@ func addCode(_ *cobra.Command, args []string) {
 		description = args[0]
 	}
 
-	s, err := service.AddCode("", description, tags)
+	s, err := service.CreateCode("", description, tags)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	fmt.Printf("Code snippet added\n%s", s.String())
-}
-
-func resolveContent(label string, args []string) string {
-	content := ""
-	if len(args) > 0 {
-		content = args[0]
-	}
-
-	if content == "" {
-		var err error
-		content, err = snippet.Edit(label, content)
-		if err != nil {
-			fmt.Println(err)
-			return ""
-		}
-	}
-
-	return content
 }
 
 func init() {

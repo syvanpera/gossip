@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/spf13/viper"
 	"github.com/syvanpera/gossip/util"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -16,8 +15,8 @@ type sqliteRepository struct {
 	db *sqlx.DB
 }
 
-func NewSQLiteRepository() Repository {
-	return &sqliteRepository{db: openDB(viper.GetString("database"))}
+func NewSQLiteRepository(db string) Repository {
+	return &sqliteRepository{db: openDB(db)}
 }
 
 func openDB(file string) *sqlx.DB {
@@ -122,7 +121,7 @@ func (r *sqliteRepository) FindWithFilters(filters Filters) ([]Snippet, error) {
 	return ss, nil
 }
 
-func (r *sqliteRepository) Del(id int) error {
+func (r *sqliteRepository) Delete(id int) error {
 	_, err := r.db.Exec("DELETE FROM snippets WHERE id = $1", id)
 
 	return err

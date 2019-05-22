@@ -79,8 +79,7 @@ func list(t snippet.SnippetType) {
 		filters.Tags = tagFilter
 	}
 
-	r := snippet.NewSQLiteRepository()
-	snippets, err := r.FindWithFilters(filters)
+	snippets, err := service.FindSnippets(filters)
 	if err != nil {
 		fmt.Println(err)
 		return

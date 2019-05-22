@@ -6,9 +6,12 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/syvanpera/gossip/snippet"
 )
 
 var cfgFile string
+
+var service snippet.Service
 
 var rootCmd = &cobra.Command{
 	Use:   "gossip",
@@ -35,6 +38,8 @@ func init() {
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "debug")
 	viper.BindPFlag("color", rootCmd.PersistentFlags().Lookup("color"))
 	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
+
+	service = snippet.NewService(snippet.NewSQLiteRepository("gossip.db"))
 }
 
 func initConfig() {
