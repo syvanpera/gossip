@@ -60,9 +60,9 @@ func (b *Bookmark) String() string {
 
 	fmt.Fprintf(&output, "\n%s ", au.BrightCyan(fmt.Sprintf("%d.", b.data.ID)))
 	fmt.Fprintln(&output, au.Bold(au.BrightGreen(b.data.Description)))
-	fmt.Fprintf(&output, "   %s %s\n", au.BrightRed(">"), au.BrightYellow(b.data.Content))
+	fmt.Fprintf(&output, "   %s %s", au.BrightRed(">"), au.BrightYellow(b.data.Content))
 	if b.data.Tags != "" {
-		fmt.Fprintf(&output, "   %s %s\n", au.BrightRed("#"), au.BrightBlue(b.data.Tags))
+		fmt.Fprintf(&output, "\n   %s %s", au.BrightRed("#"), au.BrightBlue(b.data.Tags))
 	}
 
 	return output.String()

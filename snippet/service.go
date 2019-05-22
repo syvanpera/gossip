@@ -126,7 +126,7 @@ func (s *service) CreateCode(content, description, tags string) (Snippet, error)
 	data := SnippetData{
 		Content:     "",
 		Description: "",
-		Tags:        tags,
+		Tags:        "",
 		Language:    "",
 		Type:        CODE,
 	}
@@ -145,6 +145,11 @@ func (s *service) CreateCode(content, description, tags string) (Snippet, error)
 
 	data.Content = content
 	data.Description = description
+	if tags == "" {
+		tags = language
+	} else {
+		tags = language + "," + tags
+	}
 	data.Tags = tags
 	data.Language = language
 
@@ -177,7 +182,7 @@ func (s *service) UpdateSnippet(id int, tags string) (Snippet, error) {
 			existingTags = append(existingTags, tag)
 		}
 	}
-	snippet.Data().Tags = strings.Trim(strings.Join(newTags, ","), " ,")
+	snippet.Data().Tags = strings.Trim(strings.Join(existingTags, ","), " ,")
 	if err := s.repository.Update(snippet); err != nil {
 		return nil, err
 	}

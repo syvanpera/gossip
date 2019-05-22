@@ -31,18 +31,16 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(initGossip)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/gossip/config.toml)")
 	rootCmd.PersistentFlags().BoolP("color", "c", false, "toggle color output")
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "debug")
 	viper.BindPFlag("color", rootCmd.PersistentFlags().Lookup("color"))
 	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
-
-	service = snippet.NewService(snippet.NewSQLiteRepository("gossip.db"))
 }
 
-func initConfig() {
+func initGossip() {
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
 	} else {
@@ -60,4 +58,6 @@ func initConfig() {
 	viper.SetDefault("database", "gossip.db")
 	viper.SetDefault("defaults.color", true)
 	viper.SetDefault("defaults.browser", "default")
+
+	service = snippet.NewService(snippet.NewSQLiteRepository(viper.GetString("database")))
 }

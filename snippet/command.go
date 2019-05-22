@@ -60,9 +60,9 @@ func (c *Command) String() string {
 
 	fmt.Fprintf(&output, "\n%s ", au.BrightCyan(fmt.Sprintf("%d.", c.data.ID)))
 	fmt.Fprintln(&output, au.Bold(au.BrightGreen(c.data.Description)))
-	fmt.Fprintf(&output, "   %s %s\n", au.BrightRed(">"), au.BrightYellow(c.data.Content))
+	fmt.Fprintf(&output, "   %s %s", au.BrightRed(">"), au.BrightYellow(c.data.Content))
 	if c.data.Tags != "" {
-		fmt.Fprintf(&output, "   %s %s\n", au.BrightRed("#"), au.BrightBlue(c.data.Tags))
+		fmt.Fprintf(&output, "\n   %s %s", au.BrightRed("#"), au.BrightBlue(c.data.Tags))
 	}
 
 	return output.String()

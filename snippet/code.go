@@ -126,10 +126,14 @@ func (c *Code) String() string {
 	borderVert := au.Gray(8, "│")
 
 	fmt.Fprintf(&output, "\n%s\n", au.Gray(8, util.ReplaceRuneAtIndex(border, '┬', 8)))
-	fmt.Fprintf(&output, "%s%s %s\n",
-		au.Cyan(util.CenterStr(fmt.Sprintf("#%d", c.data.ID), 8)),
+	fmt.Fprintf(&output, "%s%s %s",
+		au.Cyan(util.CenterStr(fmt.Sprintf("%d.", c.data.ID), 8)),
 		borderVert,
 		au.Yellow(description))
+	if c.data.Tags != "" {
+		fmt.Fprintf(&output, au.BrightBlue(fmt.Sprintf(" (%s)", c.data.Tags)).String())
+	}
+	fmt.Fprintf(&output, "\n")
 	fmt.Fprintln(&output, au.Gray(8, util.ReplaceRuneAtIndex(border, '┼', 8)))
 
 	content := c.data.Content
