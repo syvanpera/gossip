@@ -14,8 +14,8 @@ var (
 	addCmd = &cobra.Command{
 		Use:     "add",
 		Aliases: []string{"a", "new", "n"},
-		Short:   "Create a new snippet",
-		Long:    `Create a new snippet"`,
+		Short:   "Add a new snippet",
+		Long:    `Add a new snippet"`,
 		Args:    cobra.MaximumNArgs(2),
 		Run:     add,
 	}
@@ -23,8 +23,8 @@ var (
 	addCommandCmd = &cobra.Command{
 		Use:     "cmd",
 		Aliases: []string{"command", "c"},
-		Short:   "Create a new command snippet",
-		Long:    `Create a new command snippet`,
+		Short:   "Add a new command snippet",
+		Long:    `Add a new command snippet`,
 		Args:    cobra.MaximumNArgs(2),
 		Run:     addCommand,
 	}
@@ -32,8 +32,8 @@ var (
 	addCodeCmd = &cobra.Command{
 		Use:     "code",
 		Aliases: []string{"d"},
-		Short:   "Create a new code snippet",
-		Long:    `Create a new code snippet`,
+		Short:   "Add a new code snippet",
+		Long:    `Add a new code snippet`,
 		Args:    cobra.MaximumNArgs(1),
 		Run:     addCode,
 	}
@@ -41,8 +41,8 @@ var (
 	addBookmarkCmd = &cobra.Command{
 		Use:     "url",
 		Aliases: []string{"u", "bookmark", "bm", "b"},
-		Short:   "Create a new bookmark",
-		Long:    `Create a new bookmark`,
+		Short:   "Add a new bookmark",
+		Long:    `Add a new bookmark`,
 		Args:    cobra.MaximumNArgs(2),
 		Run:     addBookmark,
 	}
@@ -56,7 +56,7 @@ func add(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	choice, err := ui.Choose("Create what", []string{"Bookmark", "Command", "Code snippet"})
+	choice, err := ui.Choose("Add what", []string{"Bookmark", "Command", "Code snippet"})
 	if err != nil {
 		return
 	}
