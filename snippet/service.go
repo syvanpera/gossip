@@ -3,6 +3,8 @@ package snippet
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"regexp"
 	"strings"
 
@@ -20,7 +22,7 @@ type Service interface {
 	GetSnippet(id int) (Snippet, error)
 	CreateBookmark(content, description, tags string) (Snippet, error)
 	CreateCommand(content, description, tags string) (Snippet, error)
-	CreateCode(content, description, tags string) (Snippet, error)
+	CreateCode(content, description, tags string, language string) (Snippet, error)
 	UpdateSnippet(id int, tags string) (Snippet, error)
 	DeleteSnippet(id int, force bool) error
 	FindSnippets(f Filters) ([]Snippet, error)
@@ -122,7 +124,7 @@ func (s *service) CreateCommand(content, description, tags string) (Snippet, err
 	return snippet, nil
 }
 
-func (s *service) CreateCode(content, description, tags string) (Snippet, error) {
+func (s *service) CreateCode(content, description, tags string, language string) (Snippet, error) {
 	data := SnippetData{
 		Content:     "",
 		Description: "",
@@ -131,17 +133,30 @@ func (s *service) CreateCode(content, description, tags string) (Snippet, error)
 		Type:        CODE,
 	}
 
+	fi, _ := os.Stdin.Stat()
+	if (fi.Mode() & os.ModeCharDevice) == 0 {
+		bytes, err := ioutil.ReadAll(os.Stdin)
+		if err != nil {
+			return nil, err
+		}
+		content = string(bytes)
+	}
+
 	if description == "" {
 		if description = ui.Prompt("Description", description); description == "" {
 			return nil, ErrCanceled
 		}
 	}
 
-	if content = ui.Editor(""); content == "" {
-		return nil, ErrCanceled
+	if content == "" {
+		if content = ui.Editor(""); content == "" {
+			return nil, ErrCanceled
+		}
 	}
 
-	language := ui.Prompt("Language", "")
+	if language == "" {
+		language = ui.Prompt("Language", "")
+	}
 
 	data.Content = content
 	data.Description = description

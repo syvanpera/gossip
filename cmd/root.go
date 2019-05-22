@@ -36,8 +36,11 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/gossip/config.toml)")
 	rootCmd.PersistentFlags().BoolP("color", "c", false, "toggle color output")
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "debug")
+	rootCmd.PersistentFlags().BoolP("quiet", "q", false, "be quiet")
+
 	viper.BindPFlag("color", rootCmd.PersistentFlags().Lookup("color"))
 	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
+	viper.BindPFlag("quiet", rootCmd.PersistentFlags().Lookup("quiet"))
 }
 
 func initGossip() {

@@ -5,10 +5,12 @@ import (
 	"regexp"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/syvanpera/gossip/ui"
 )
 
 var tags string
+var language string
 
 var (
 	addCmd = &cobra.Command{
@@ -112,18 +114,23 @@ func addCommand(_ *cobra.Command, args []string) {
 }
 
 func addCode(_ *cobra.Command, args []string) {
+	quiet := viper.GetBool("quiet")
 	description := ""
 	if len(args) > 0 {
 		description = args[0]
 	}
 
-	s, err := service.CreateCode("", description, tags)
+	s, err := service.CreateCode("", description, tags, language)
 	if err != nil {
-		fmt.Println(err)
+		if !quiet {
+			fmt.Println(err)
+		}
 		return
 	}
 
-	fmt.Printf("Code snippet added\n%s", s.String())
+	if !quiet {
+		fmt.Printf("Code snippet added\n%s", s.String())
+	}
 }
 
 func init() {
@@ -133,4 +140,5 @@ func init() {
 	rootCmd.AddCommand(addCmd)
 
 	addCmd.PersistentFlags().StringVarP(&tags, "tags", "t", "", "tags")
+	addCodeCmd.Flags().StringVarP(&language, "language", "l", "", "language")
 }
