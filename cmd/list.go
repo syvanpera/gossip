@@ -75,7 +75,7 @@ func list(t snippet.SnippetType) {
 		Language: languageFilter,
 		Type:     t,
 	}
-	if tags != "" {
+	if tagFilter != "" {
 		filters.Tags = tagFilter
 	}
 
