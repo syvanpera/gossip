@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/google/go-github/v25/github"
+	"github.com/google/go-github/v35/github"
 )
 
 type Github struct{}
