@@ -1,5 +1,3 @@
-database = "gossip.db"
-
-[defaults]
+[config]
 browser = "default"
 color = true

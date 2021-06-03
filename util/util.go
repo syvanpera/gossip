@@ -2,10 +2,12 @@ package util
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"math"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"golang.org/x/crypto/ssh/terminal"
@@ -85,4 +87,42 @@ func Contains(ss []string, s string) bool {
 	}
 
 	return false
+}
+
+func UserDataDir() (string, error) {
+	var dir string
+
+	switch runtime.GOOS {
+	// case "windows":
+	// 	dir = Getenv("LocalAppData")
+	// 	if dir == "" {
+	// 		return "", errors.New("%LocalAppData% is not defined")
+	// 	}
+
+	// case "darwin", "ios":
+	// 	dir = Getenv("HOME")
+	// 	if dir == "" {
+	// 		return "", errors.New("$HOME is not defined")
+	// 	}
+	// 	dir += "/Library/Caches"
+
+	// case "plan9":
+	// 	dir = Getenv("home")
+	// 	if dir == "" {
+	// 		return "", errors.New("$home is not defined")
+	// 	}
+	// 	dir += "/lib/cache"
+
+	default: // Unix
+		dir = os.Getenv("XDG_DATA_HOME")
+		if dir == "" {
+			dir = os.Getenv("HOME")
+			if dir == "" {
+				return "", errors.New("neither $XDG_DATA_HOME nor $HOME are defined")
+			}
+			dir += "/.local/share"
+		}
+	}
+
+	return dir, nil
 }

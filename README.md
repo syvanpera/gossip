@@ -26,3 +26,7 @@ Inspired by
 
 ### Commands
 <img src="demo-commands.gif" width="700">
+
+## TODO
+
+* Switch to using https://github.com/peterh/liner (instead of github.com/chzyer/readline)
