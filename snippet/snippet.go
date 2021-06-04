@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	COMMAND  = "COMMAND"
-	CODE     = "CODE"
-	BOOKMARK = "BOOKMARK"
+	COMMAND  = "Commands"
+	CODE     = "Code snippets"
+	BOOKMARK = "Bookmarks"
 	SNIP     = "SNIP"
 )
 

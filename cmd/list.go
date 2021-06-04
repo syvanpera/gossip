@@ -53,30 +53,30 @@ var (
 var tags, language string
 
 func listDefault(_ *cobra.Command, _ []string) {
-	choice, err := ui.Choose("List what", []string{"Bookmarks", "Commands", "Code snippets"})
+	choice, err := ui.Choose("List what", []string{snippet.BOOKMARK, snippet.COMMAND, snippet.CODE})
 
 	if err != nil {
 		fmt.Println("Canceled")
 		return
 	}
 
-	switch choice {
-	case "Bookmarks":
-		list(snippet.BOOKMARK)
-	case "Commands":
-		list(snippet.COMMAND)
-	case "Code snippets":
-		list(snippet.CODE)
-	}
+	list(snippet.SnippetType(choice))
+
+	// switch choice {
+	// case "Bookmarks":
+	// 	list(snippet.BOOKMARK)
+	// case "Commands":
+	// 	list(snippet.COMMAND)
+	// case "Code snippets":
+	// 	list(snippet.CODE)
+	// }
 }
 
 func list(t snippet.SnippetType) {
 	filters := snippet.Filters{
 		Language: language,
 		Type:     t,
-	}
-	if tags != "" {
-		filters.Tags = tags
+		Tags:     tags,
 	}
 
 	r := snippet.NewRepository()
