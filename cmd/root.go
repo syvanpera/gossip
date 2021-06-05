@@ -4,11 +4,15 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/syvanpera/gossip/snippet"
+	"github.com/syvanpera/gossip/util"
 )
+
+var appName = "gossip"
 
 var service snippet.Service
 
@@ -44,7 +48,7 @@ func init() {
 func initConfig() {
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
-	viper.AddConfigPath(fmt.Sprintf("%s/%s", configPath(), appName))
+	viper.AddConfigPath(filepath.Clean(fmt.Sprintf("%s/%s", configPath(), appName)))
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
@@ -53,7 +57,25 @@ func initConfig() {
 
 	viper.SetDefault("config.color", true)
 	viper.SetDefault("config.browser", "default")
-	viper.SetDefault("database", fmt.Sprintf("%s/%s/%s.db", dataPath(), appName, appName))
+	viper.SetDefault("database", filepath.Clean(fmt.Sprintf("%s/%s/%s.db", dataPath(), appName, appName)))
 
 	service = snippet.NewService(snippet.NewSQLiteRepository(viper.GetString("database")))
+}
+
+func configPath() string {
+	dir, err := os.UserConfigDir()
+	if err != nil {
+		log.Fatal("Unable to resolve user config directory.", err)
+	}
+
+	return dir
+}
+
+func dataPath() string {
+	dir, err := util.UserDataDir()
+	if err != nil {
+		log.Fatal("Unable to resolve user data directory.", err)
+	}
+
+	return dir
 }
