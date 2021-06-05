@@ -42,9 +42,11 @@ func (Github) Extract(url string) (*MetaData, error) {
 		return nil, ErrMetaExtraction
 	}
 
+	// TODO Add the language to the tags, just need to check that it's not already in the topics
 	meta := MetaData{
 		Description: strings.TrimSpace(html.UnescapeString(fmt.Sprintf("%s: %s", *repos.FullName, *repos.Description))),
-		Tags:        fmt.Sprintf("%s,%s", "github", strings.ToLower(*repos.Language)),
+		Tags:        strings.Join(repos.Topics, ","),
+		// Tags:        fmt.Sprintf("%s,%s", "github", strings.ToLower(*repos.Language)),
 	}
 
 	fmt.Println("Done")
