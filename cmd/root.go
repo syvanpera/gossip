@@ -2,14 +2,13 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/syvanpera/gossip/snippet"
 )
-
-var cfgFile string
 
 var service snippet.Service
 
@@ -31,9 +30,8 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initGossip)
+	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/gossip/config.toml)")
 	rootCmd.PersistentFlags().BoolP("color", "c", false, "toggle color output")
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "debug")
 	rootCmd.PersistentFlags().BoolP("quiet", "q", false, "be quiet")
@@ -43,24 +41,19 @@ func init() {
 	viper.BindPFlag("quiet", rootCmd.PersistentFlags().Lookup("quiet"))
 }
 
-func initGossip() {
-	if cfgFile != "" {
-		viper.SetConfigFile(cfgFile)
-	} else {
-		viper.SetConfigName("config")
-		viper.AddConfigPath(".")
-		viper.AddConfigPath("$HOME/.config/gossip")
-	}
-
+func initConfig() {
+	viper.SetConfigName("config")
+	viper.AddConfigPath(".")
+	viper.AddConfigPath(fmt.Sprintf("%s/%s", configPath(), appName))
 	viper.AutomaticEnv()
-	err := viper.ReadInConfig()
-	if err != nil {
-		panic(err)
+
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatal(err)
 	}
 
-	viper.SetDefault("database", "gossip.db")
-	viper.SetDefault("defaults.color", true)
-	viper.SetDefault("defaults.browser", "default")
+	viper.SetDefault("config.color", true)
+	viper.SetDefault("config.browser", "default")
+	viper.SetDefault("database", fmt.Sprintf("%s/%s/%s.db", dataPath(), appName, appName))
 
 	service = snippet.NewService(snippet.NewSQLiteRepository(viper.GetString("database")))
 }
