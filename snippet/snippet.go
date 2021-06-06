@@ -37,7 +37,8 @@ type Snippet interface {
 	Data() *SnippetData
 	Execute() error
 	Edit() error
-	String() string
+	Render() string
+	String(plural bool) string
 }
 
 // Filters are used to filter the snippets list

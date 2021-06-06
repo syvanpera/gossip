@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/syvanpera/gossip/gossip"
 	"github.com/syvanpera/gossip/snippet"
 	"github.com/syvanpera/gossip/util"
 )
@@ -15,6 +16,7 @@ import (
 var appName = "gossip"
 
 var service snippet.Service
+var gossipService gossip.Service
 
 var rootCmd = &cobra.Command{
 	Use:   "gossip",
@@ -60,6 +62,7 @@ func initConfig() {
 	viper.SetDefault("database", filepath.Clean(fmt.Sprintf("%s/%s/%s.db", dataPath(), appName, appName)))
 
 	service = snippet.NewService(snippet.NewSQLiteRepository(viper.GetString("database")))
+	gossipService = gossip.NewService(viper.GetString("database"))
 }
 
 func configPath() string {

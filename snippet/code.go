@@ -115,8 +115,8 @@ func (c *Code) Edit() error {
 	return nil
 }
 
-func (c *Code) String() string {
-	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
+func (c *Code) Render() string {
+	colors := viper.GetBool("config.color") != viper.GetBool("color")
 	au := aurora.NewAurora(colors)
 
 	var output strings.Builder
@@ -150,4 +150,12 @@ func (c *Code) String() string {
 	fmt.Fprintf(&output, "%s", au.Gray(8, util.ReplaceRuneAtIndex(border, '┴', 8)))
 
 	return output.String()
+}
+
+func (c *Code) String(plural bool) string {
+	if plural {
+		return "code snippets"
+	} else {
+		return "code snippet"
+	}
 }

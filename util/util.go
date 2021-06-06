@@ -10,6 +10,8 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/logrusorgru/aurora"
+	"github.com/spf13/viper"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -87,6 +89,13 @@ func Contains(ss []string, s string) bool {
 	}
 
 	return false
+}
+
+func PrintError(err error) {
+	colors := viper.GetBool("config.color") != viper.GetBool("color")
+	au := aurora.NewAurora(colors)
+
+	fmt.Println(fmt.Sprintf("%s %s", au.Bold(au.BrightRed("[ERROR]")), err))
 }
 
 func UserDataDir() (string, error) {

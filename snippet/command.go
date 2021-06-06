@@ -52,13 +52,13 @@ func (c *Command) Edit() error {
 	return nil
 }
 
-func (c *Command) String() string {
-	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
+func (c *Command) Render() string {
+	colors := viper.GetBool("config.color") != viper.GetBool("color")
 	au := aurora.NewAurora(colors)
 
 	var output strings.Builder
 
-	fmt.Fprintf(&output, "\n%s ", au.BrightCyan(fmt.Sprintf("%d.", c.data.ID)))
+	fmt.Fprintf(&output, "%s ", au.BrightCyan(fmt.Sprintf("%d.", c.data.ID)))
 	fmt.Fprintln(&output, au.Bold(au.BrightGreen(c.data.Description)))
 	fmt.Fprintf(&output, "   %s %s", au.BrightRed(">"), au.BrightYellow(c.data.Content))
 	if c.data.Tags != "" {
@@ -66,4 +66,12 @@ func (c *Command) String() string {
 	}
 
 	return output.String()
+}
+
+func (c *Command) String(plural bool) string {
+	if plural {
+		return "commands"
+	} else {
+		return "command"
+	}
 }

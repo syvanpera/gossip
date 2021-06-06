@@ -74,7 +74,7 @@ Type: {{.Type}}{{if .Language}}Language: {{.Language}}{{end}}
 `
 
 func test(cmd *cobra.Command, args []string) {
-	fmt.Println(viper.GetString("defaults.browser"))
+	fmt.Println(viper.GetString("configs.browser"))
 }
 
 func testEdit(cmd *cobra.Command, args []string) {
@@ -193,7 +193,7 @@ func testLanguages(cmd *cobra.Command, args []string) {
 }
 
 func testAdd(cmd *cobra.Command, args []string) {
-	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
+	colors := viper.GetBool("config.color") != viper.GetBool("color")
 	au := aurora.NewAurora(colors)
 	// s, err := testScan(au.Yellow("Snippet> ").String())
 	// if err == testErrCanceled {

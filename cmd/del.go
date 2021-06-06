@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/spf13/cobra"
-	"github.com/syvanpera/gossip/snippet"
+	"github.com/syvanpera/gossip/util"
 )
 
 var force bool
@@ -31,16 +31,12 @@ var delCmd = &cobra.Command{
 func del(cmd *cobra.Command, args []string) {
 	id, _ := strconv.Atoi(args[0])
 
-	err := service.DeleteSnippet(id, force)
-	if err == snippet.ErrNotFound {
-		fmt.Printf("Snippet #%d not found\n", id)
-		return
-	} else if err != nil {
-		fmt.Println(err)
+	if err := gossipService.Delete(id); err != nil {
+		util.PrintError(err)
 		return
 	}
 
-	fmt.Println("Snippet deleted...")
+	fmt.Printf("Bookmark #%d deleted...\n", id)
 }
 
 func init() {

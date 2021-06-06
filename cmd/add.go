@@ -6,10 +6,13 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/syvanpera/gossip/gossip"
 	"github.com/syvanpera/gossip/ui"
+	"github.com/syvanpera/gossip/util"
 )
 
 var tags string
+var stdin bool
 var language string
 
 var (
@@ -23,8 +26,8 @@ var (
 	}
 
 	addCommandCmd = &cobra.Command{
-		Use:     "cmd",
-		Aliases: []string{"command", "c"},
+		Use:     "command",
+		Aliases: []string{"cmd", "c"},
 		Short:   "Add a new command snippet",
 		Long:    `Add a new command snippet`,
 		Args:    cobra.MaximumNArgs(2),
@@ -41,8 +44,8 @@ var (
 	}
 
 	addBookmarkCmd = &cobra.Command{
-		Use:     "url",
-		Aliases: []string{"u", "bookmark", "bm", "b"},
+		Use:     "bookmark",
+		Aliases: []string{"b"},
 		Short:   "Add a new bookmark",
 		Long:    `Add a new bookmark`,
 		Args:    cobra.MaximumNArgs(2),
@@ -84,13 +87,13 @@ func addBookmark(_ *cobra.Command, args []string) {
 		description = args[1]
 	}
 
-	s, err := service.CreateBookmark(content, description, tags)
+	s, err := gossipService.Create(gossip.BOOKMARK, content, description, tags)
 	if err != nil {
-		fmt.Println(err)
+		util.PrintError(err)
 		return
 	}
 
-	fmt.Printf("Bookmark added\n%s", s.String())
+	fmt.Println(s)
 }
 
 func addCommand(_ *cobra.Command, args []string) {
@@ -110,7 +113,7 @@ func addCommand(_ *cobra.Command, args []string) {
 		return
 	}
 
-	fmt.Printf("Command added\n%s", s.String())
+	fmt.Printf("Command added\n%s", s.Render())
 }
 
 func addCode(_ *cobra.Command, args []string) {
@@ -129,7 +132,7 @@ func addCode(_ *cobra.Command, args []string) {
 	}
 
 	if !quiet {
-		fmt.Printf("Code snippet added\n%s", s.String())
+		fmt.Printf("Code snippet added\n%s", s.Render())
 	}
 }
 
@@ -140,5 +143,6 @@ func init() {
 	rootCmd.AddCommand(addCmd)
 
 	addCmd.PersistentFlags().StringVarP(&tags, "tags", "t", "", "tags")
+	addCodeCmd.Flags().BoolVarP(&stdin, "stdin", "s", false, "read from stdin")
 	addCodeCmd.Flags().StringVarP(&language, "language", "l", "", "language")
 }

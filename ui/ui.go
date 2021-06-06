@@ -62,11 +62,12 @@ func Editor(content string) string {
 	f.Close()
 
 	editor, _ := exec.LookPath(os.Getenv("EDITOR"))
-
 	command := exec.Command(editor, f.Name())
+
 	command.Stdin = os.Stdin
 	command.Stdout = os.Stdout
 	command.Stderr = os.Stderr
+
 	if err = command.Start(); err != nil {
 		return ""
 	}

@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-var ErrMetaExtraction = errors.New("errors while extracting metadata")
+var ErrMetaExtraction = errors.New("error while extracting metadata")
 var ErrMetaNotSupported = errors.New("can't handle this")
 
 var extractors []Extractor

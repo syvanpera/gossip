@@ -14,7 +14,7 @@ var (
 		Aliases: []string{"ls", "l"},
 		Short:   "List snippets",
 		Long:    `List snippets`,
-		Run:     listDefault,
+		Run:     listPrompt,
 	}
 
 	listCommandCmd = &cobra.Command{
@@ -50,13 +50,13 @@ var (
 	}
 )
 
-var tagFilter, languageFilter string
+var filterTags string
+var languageFilter string
 
-func listDefault(_ *cobra.Command, _ []string) {
+func listPrompt(_ *cobra.Command, _ []string) {
 	choice, err := ui.Choose("List what", []string{"Bookmarks", "Commands", "Code snippets"})
-
 	if err != nil {
-		fmt.Println("Canceled")
+		// fmt.Println("Nevermind")
 		return
 	}
 
@@ -71,22 +71,22 @@ func listDefault(_ *cobra.Command, _ []string) {
 }
 
 func list(t snippet.SnippetType) {
-	filters := snippet.Filters{
-		Language: languageFilter,
-		Type:     t,
-	}
-	if tagFilter != "" {
-		filters.Tags = tagFilter
-	}
+	// filters := snippet.Filters{
+	// 	Language: languageFilter,
+	// 	Type:     t,
+	// }
+	// if filterTags != "" {
+	// 	filters.Tags = filterTags
+	// }
 
-	snippets, err := service.FindSnippets(filters)
+	result, err := gossipService.List(filterTags)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	for _, s := range snippets {
-		fmt.Println(s)
+	for _, r := range result {
+		fmt.Println(r.Render())
 	}
 }
 
@@ -96,6 +96,6 @@ func init() {
 	listCmd.AddCommand(listBookmarkCmd)
 	rootCmd.AddCommand(listCmd)
 
-	listCmd.PersistentFlags().StringVarP(&tagFilter, "tags", "t", "", "Tags filter (comma separated)")
-	listCodeCmd.Flags().StringVarP(&languageFilter, "language", "l", "", "Language filter")
+	listCmd.PersistentFlags().StringVarP(&tags, "tags", "t", "", "Filter by tags (comma separated)")
+	listCodeCmd.Flags().StringVarP(&language, "language", "l", "", "Filter by language")
 }

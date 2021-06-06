@@ -59,7 +59,7 @@ func (s *service) CreateBookmark(content, description, tags string) (Snippet, er
 	}
 
 	if matched, _ := regexp.MatchString("^https?://*", content); !matched {
-		content = "http://" + content
+		content = "https://" + content
 	}
 
 	if description == "" || tags == "" {
@@ -211,9 +211,9 @@ func (s *service) DeleteSnippet(id int, force bool) error {
 		return err
 	}
 
-	fmt.Println(snippet)
+	fmt.Println(snippet.Render())
 
-	if !force && !ui.Confirm("Are you sure you want to delete this snippet") {
+	if !force && !ui.Confirm(fmt.Sprintf("Are you sure you want to delete this %s", snippet.String(false))) {
 		return ErrCanceled
 	}
 
