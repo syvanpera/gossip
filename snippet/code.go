@@ -117,7 +117,7 @@ func (c *Code) Edit() error {
 }
 
 func (c *Code) String() string {
-	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
+	colors := viper.GetBool("config.color") != viper.GetBool("color")
 	au := aurora.NewAurora(colors)
 
 	var output strings.Builder

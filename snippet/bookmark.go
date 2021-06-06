@@ -20,7 +20,7 @@ func (b *Bookmark) Type() SnippetType  { return BOOKMARK }
 func (b *Bookmark) Data() *SnippetData { return &b.data }
 
 func (b *Bookmark) Execute() error {
-	br := viper.GetString("defaults.browser")
+	br := viper.GetString("config.browser")
 	fmt.Printf("Okay, opening link in %s browser...\n", br)
 	url := b.data.Content
 	if matched, _ := regexp.MatchString("^http(s)?://*", url); !matched {
@@ -52,7 +52,7 @@ func (b *Bookmark) Edit() error {
 }
 
 func (b *Bookmark) String() string {
-	colors := viper.GetBool("defaults.color") != viper.GetBool("color")
+	colors := viper.GetBool("config.color") != viper.GetBool("color")
 	au := aurora.NewAurora(colors)
 
 	var output strings.Builder
