@@ -44,14 +44,6 @@ func (s *service) GetSnippet(id int) (Snippet, error) {
 }
 
 func (s *service) CreateBookmark(content, description, tags string) (Snippet, error) {
-	data := SnippetData{
-		Content:     "",
-		Description: "",
-		Tags:        tags,
-		Language:    "",
-		Type:        BOOKMARK,
-	}
-
 	if content == "" {
 		if content = ui.Prompt("URL", content); content == "" {
 			return nil, ErrCanceled
@@ -79,9 +71,12 @@ func (s *service) CreateBookmark(content, description, tags string) (Snippet, er
 		}
 	}
 
-	data.Content = content
-	data.Description = description
-	data.Tags = tags
+	data := SnippetData{
+		Type:        BOOKMARK,
+		Content:     content,
+		Description: description,
+		Tags:        util.NormalizeTags(tags),
+	}
 
 	snippet := NewSnippet(data)
 	if err := s.repository.Create(snippet); err != nil {

@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/syvanpera/gossip/gossip"
+	"github.com/syvanpera/gossip/meta"
 	"github.com/syvanpera/gossip/ui"
 	"github.com/syvanpera/gossip/util"
 )
@@ -80,11 +81,34 @@ func addBookmark(_ *cobra.Command, args []string) {
 	content := ""
 	if len(args) > 0 {
 		content = args[0]
+	} else if content = ui.Prompt("URL", content); content == "" {
+		return
+	}
+
+	if matched, _ := regexp.MatchString("^https?://*", content); !matched {
+		content = "https://" + content
 	}
 
 	description := ""
 	if len(args) > 1 {
 		description = args[1]
+	}
+
+	if description == "" || tags == "" {
+		if meta := meta.Extract(content); meta != nil {
+			if description == "" {
+				description = meta.Description
+			}
+			if tags == "" {
+				tags = fmt.Sprintf("%s,%s", tags, meta.Tags)
+			}
+		}
+	}
+
+	if description == "" {
+		if description = ui.Prompt("Description", description); description == "" {
+			return
+		}
 	}
 
 	s, err := gossipService.Create(gossip.BOOKMARK, content, description, tags)
@@ -93,7 +117,7 @@ func addBookmark(_ *cobra.Command, args []string) {
 		return
 	}
 
-	fmt.Println(s)
+	fmt.Println(s.Render())
 }
 
 func addCommand(_ *cobra.Command, args []string) {

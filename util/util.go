@@ -136,3 +136,22 @@ func UserDataDir() (string, error) {
 
 	return dir, nil
 }
+
+func NormalizeTags(tags string) string {
+	tagsSlice := strings.Split(tags, ",")
+	unique := map[string]bool{}
+
+	for v := range tagsSlice {
+		t := strings.ToLower(strings.TrimSpace(tagsSlice[v]))
+		if t != "" {
+			unique[t] = true
+		}
+	}
+
+	result := []string{}
+	for key := range unique {
+		result = append(result, key)
+	}
+
+	return strings.Join(result, ",")
+}

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/syvanpera/gossip/snippet"
+	"github.com/syvanpera/gossip/gossip"
 	"github.com/syvanpera/gossip/ui"
 )
 
@@ -24,7 +24,7 @@ var (
 		Long:    `List command snippets`,
 		Args:    cobra.NoArgs,
 		Run: func(_ *cobra.Command, _ []string) {
-			list(snippet.COMMAND)
+			list(gossip.COMMAND)
 		},
 	}
 
@@ -35,7 +35,7 @@ var (
 		Long:    `List code snippets`,
 		Args:    cobra.NoArgs,
 		Run: func(_ *cobra.Command, _ []string) {
-			list(snippet.CODE)
+			list(gossip.CODE)
 		},
 	}
 
@@ -45,7 +45,7 @@ var (
 		Short:   "List bookmarks",
 		Long:    `List bookmarks`,
 		Run: func(_ *cobra.Command, _ []string) {
-			list(snippet.BOOKMARK)
+			list(gossip.BOOKMARK)
 		},
 	}
 )
@@ -56,21 +56,20 @@ var languageFilter string
 func listPrompt(_ *cobra.Command, _ []string) {
 	choice, err := ui.Choose("List what", []string{"Bookmarks", "Commands", "Code snippets"})
 	if err != nil {
-		// fmt.Println("Nevermind")
 		return
 	}
 
 	switch choice {
 	case "Bookmarks":
-		list(snippet.BOOKMARK)
+		list(gossip.BOOKMARK)
 	case "Commands":
-		list(snippet.COMMAND)
+		list(gossip.COMMAND)
 	case "Code snippets":
-		list(snippet.CODE)
+		list(gossip.CODE)
 	}
 }
 
-func list(t snippet.SnippetType) {
+func list(gossipType int) {
 	// filters := snippet.Filters{
 	// 	Language: languageFilter,
 	// 	Type:     t,
@@ -79,7 +78,7 @@ func list(t snippet.SnippetType) {
 	// 	filters.Tags = filterTags
 	// }
 
-	result, err := gossipService.List(filterTags)
+	result, err := gossipService.List(gossipType, filterTags)
 	if err != nil {
 		fmt.Println(err)
 		return

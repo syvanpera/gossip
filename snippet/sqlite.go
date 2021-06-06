@@ -24,14 +24,14 @@ func openDB(file string) *sqlx.DB {
 	db, _ := sqlx.Open("sqlite3", file)
 
 	schema := `
-		CREATE TABLE IF NOT EXISTS snippets (
-			id INTEGER PRIMARY KEY,
-			content TEXT,
-			description TEXT,
-			tags TEXT,
-			type TEXT,
-			language TEXT
-		)`
+CREATE TABLE IF NOT EXISTS snippets (
+	id INTEGER PRIMARY KEY,
+	content TEXT UNIQUE,
+	description TEXT,
+	tags TEXT,
+	type TEXT,
+	language TEXT
+)`
 
 	db.MustExec(schema)
 
