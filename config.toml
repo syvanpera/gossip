@@ -1,5 +1,0 @@
-[config]
-database = "gossip.db"
-browser = "default"
-shell = "sh"
-color = true

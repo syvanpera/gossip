@@ -28,13 +28,13 @@ var findCmd = &cobra.Command{
 func find(cmd *cobra.Command, args []string) {
 	id, _ := strconv.Atoi(args[0])
 
-	s, err := gossipService.Get(id)
+	gossip, err := gossipService.Get(id)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	fmt.Println(s.Render())
+	fmt.Println(gossip.Render())
 }
 
 func init() {

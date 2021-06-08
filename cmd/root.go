@@ -36,8 +36,18 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initServices)
+	cobra.OnInitialize(initConfig)
 
+	rootCmd.PersistentFlags().BoolP("color", "c", false, "toggle color output")
+	rootCmd.PersistentFlags().BoolP("debug", "d", false, "debug")
+	rootCmd.PersistentFlags().BoolP("quiet", "q", false, "be quiet")
+
+	viper.BindPFlag("color", rootCmd.PersistentFlags().Lookup("color"))
+	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
+	viper.BindPFlag("quiet", rootCmd.PersistentFlags().Lookup("quiet"))
+}
+
+func initConfig() {
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 	viper.AddConfigPath(filepath.Clean(fmt.Sprintf("%s/%s", configPath(), appName)))
@@ -49,20 +59,10 @@ func init() {
 
 	viper.SetDefault("config.color", true)
 	viper.SetDefault("config.browser", "default")
-	viper.SetDefault("config.database", filepath.Clean(fmt.Sprintf("%s/%s/%s.db", dataPath(), appName, appName)))
+	viper.SetDefault("database.path", filepath.Clean(fmt.Sprintf("%s/%s/%s.db", dataPath(), appName, appName)))
 
-	rootCmd.PersistentFlags().BoolP("color", "c", false, "toggle color output")
-	rootCmd.PersistentFlags().BoolP("debug", "d", false, "debug")
-	rootCmd.PersistentFlags().BoolP("quiet", "q", false, "be quiet")
-
-	viper.BindPFlag("color", rootCmd.PersistentFlags().Lookup("color"))
-	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
-	viper.BindPFlag("quiet", rootCmd.PersistentFlags().Lookup("quiet"))
-}
-
-func initServices() {
-	service = snippet.NewService(snippet.NewSQLiteRepository(viper.GetString("config.database")))
-	gossipService = gossip.NewService(viper.GetString("config.database"))
+	service = snippet.NewService(snippet.NewSQLiteRepository(viper.GetString("database.path")))
+	gossipService = gossip.NewService(viper.GetString("database.path"))
 }
 
 func configPath() string {

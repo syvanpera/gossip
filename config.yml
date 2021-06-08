@@ -1,0 +1,6 @@
+database:
+  path: gossip.db
+
+config:
+  browser: default
+  color: true

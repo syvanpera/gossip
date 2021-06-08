@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/spf13/cobra"
+	"github.com/syvanpera/gossip/util"
 )
 
 var addTags string
@@ -30,13 +31,18 @@ var editCmd = &cobra.Command{
 func edit(_ *cobra.Command, args []string) {
 	id, _ := strconv.Atoi(args[0])
 
-	s, err := service.UpdateSnippet(id, addTags)
-	if err != nil {
-		fmt.Println(err)
+	if addTags == "" {
+		util.PrintError(errors.New("Tags parameter missing"))
 		return
 	}
 
-	fmt.Println(s)
+	gossip, err := gossipService.Update(id, addTags)
+	if err != nil {
+		util.PrintError(err)
+		return
+	}
+
+	fmt.Println(gossip.Render())
 }
 
 func init() {
