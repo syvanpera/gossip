@@ -29,7 +29,7 @@ func (b *Bookmark) Execute() error {
 		command := exec.Command(br, url)
 		command.Start()
 	} else {
-		fmt.Println("Okay, opening link in default browser...")
+		fmt.Printf("Opening '%s' in %s\n", url, br)
 		browser.OpenURL(url)
 	}
 

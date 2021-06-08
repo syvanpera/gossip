@@ -14,8 +14,8 @@ var addTags string
 var editCmd = &cobra.Command{
 	Use:     "edit ID [CONTENT] [DESCRIPTION]",
 	Aliases: []string{"ed", "e"},
-	Short:   "Edit a snippet",
-	Long:    `Edit a snippet"`,
+	Short:   "Edit a bookmark",
+	Long:    `Edit a bookmark"`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
 			return errors.New("requires an integer ID argument")

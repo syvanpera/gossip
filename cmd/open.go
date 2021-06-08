@@ -8,11 +8,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var findCmd = &cobra.Command{
-	Use:     "find",
-	Aliases: []string{"f", "get", "g", "show", "s"},
-	Short:   "Find a bookmark",
-	Long:    `Find a bookmark`,
+var openCmd = &cobra.Command{
+	Use:     "open",
+	Aliases: []string{"o"},
+	Short:   "Open a bookmark",
+	Long:    `Open a bookmark`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
 			return errors.New("requires an integer ID argument")
@@ -22,21 +22,15 @@ var findCmd = &cobra.Command{
 		}
 		return fmt.Errorf("invalid ID number specified: %s", args[0])
 	},
-	Run: find,
+	Run: open,
 }
 
-func find(cmd *cobra.Command, args []string) {
+func open(cmd *cobra.Command, args []string) {
 	id, _ := strconv.Atoi(args[0])
 
-	gossip, err := gossipService.Get(id)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Println(gossip.Render())
+	gossipService.Open(id)
 }
 
 func init() {
-	rootCmd.AddCommand(findCmd)
+	rootCmd.AddCommand(openCmd)
 }
