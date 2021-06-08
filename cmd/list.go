@@ -69,7 +69,7 @@ func listPrompt(_ *cobra.Command, _ []string) {
 	}
 }
 
-func list(gossipType int) {
+func list(gossipType gossip.GossipType) {
 	// filters := snippet.Filters{
 	// 	Language: languageFilter,
 	// 	Type:     t,

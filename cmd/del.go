@@ -31,7 +31,7 @@ var delCmd = &cobra.Command{
 func del(cmd *cobra.Command, args []string) {
 	id, _ := strconv.Atoi(args[0])
 
-	if err := gossipService.Delete(id); err != nil {
+	if err := gossipService.Delete(id, force); err != nil {
 		util.PrintError(err)
 		return
 	}
