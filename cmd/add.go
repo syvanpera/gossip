@@ -65,7 +65,7 @@ func add(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	fmt.Println(s.Render())
+	fmt.Println(s.Render(false))
 }
 
 func init() {

@@ -48,10 +48,10 @@ func init() {
 	viper.SetDefault("config.browser", "default")
 	viper.SetDefault("database.path", filepath.Clean(fmt.Sprintf("%s/%s/%s.db", dataPath(), appName, appName)))
 
-	rootCmd.PersistentFlags().BoolP("color", "c", false, "turn off color output")
+	// rootCmd.PersistentFlags().BoolP("color", "c", false, "turn off color output")
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "turn on debug mode")
 
-	viper.BindPFlag("color", rootCmd.PersistentFlags().Lookup("color"))
+	// viper.BindPFlag("color", rootCmd.PersistentFlags().Lookup("color"))
 	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
 }
 

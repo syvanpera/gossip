@@ -34,7 +34,7 @@ func find(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	fmt.Println(gossip.Render())
+	fmt.Println(gossip.Render(false))
 }
 
 func init() {

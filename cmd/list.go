@@ -19,16 +19,9 @@ var (
 )
 
 var tagsFilter string
+var compact bool
 
 func list() {
-	// filters := snippet.Filters{
-	// 	Language: languageFilter,
-	// 	Type:     t,
-	// }
-	// if filterTags != "" {
-	// 	filters.Tags = filterTags
-	// }
-
 	result, err := gossipService.List(tagsFilter)
 	if err != nil {
 		fmt.Println(err)
@@ -36,7 +29,7 @@ func list() {
 	}
 
 	for _, r := range result {
-		fmt.Println(r.Render())
+		fmt.Println(r.Render(compact))
 	}
 }
 
@@ -44,4 +37,5 @@ func init() {
 	rootCmd.AddCommand(listCmd)
 
 	listCmd.PersistentFlags().StringVarP(&tagsFilter, "tags", "t", "", "Filter by tags (comma separated)")
+	listCmd.PersistentFlags().BoolVarP(&compact, "compact", "c", false, "Compact one line output (useful for dmenu etc)")
 }
