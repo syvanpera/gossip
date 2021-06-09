@@ -18,8 +18,7 @@ var (
 	}
 )
 
-var filterTags string
-var languageFilter string
+var tagsFilter string
 
 func list() {
 	// filters := snippet.Filters{
@@ -30,7 +29,7 @@ func list() {
 	// 	filters.Tags = filterTags
 	// }
 
-	result, err := gossipService.List(filterTags)
+	result, err := gossipService.List(tagsFilter)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -44,5 +43,5 @@ func list() {
 func init() {
 	rootCmd.AddCommand(listCmd)
 
-	listCmd.PersistentFlags().StringVarP(&tags, "tags", "t", "", "Filter by tags (comma separated)")
+	listCmd.PersistentFlags().StringVarP(&tagsFilter, "tags", "t", "", "Filter by tags (comma separated)")
 }
