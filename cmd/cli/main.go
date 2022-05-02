@@ -1,4 +1,4 @@
-// Copyright © 2019 Tuomo Syvänperä <tuomo.syvanpera@gmail.com>
+// Copyright © 2022 Tuomo Syvänperä <tuomo.syvanpera@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,32 @@
 
 package main
 
-import "github.com/syvanpera/gossip/cmd"
+import (
+	"fmt"
+	"path/filepath"
+
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
+	"github.com/syvanpera/gossip/pkg/cmd"
+	"github.com/syvanpera/gossip/pkg/util"
+)
+
+var appName = "gossip"
+
+func init() {
+	viper.SetConfigName("config")
+	viper.AddConfigPath(".")
+	viper.AddConfigPath(filepath.Clean(fmt.Sprintf("%s/%s", util.ConfigPath(), appName)))
+	viper.AutomaticEnv()
+
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatal().Err(err).Msg("Unable to read config")
+	}
+
+	viper.SetDefault("config.color", true)
+	viper.SetDefault("config.browser", "default")
+	viper.SetDefault("database.path", filepath.Clean(fmt.Sprintf("%s/%s/%s.db", util.DataPath(), appName, appName)))
+}
 
 func main() {
 	cmd.Execute()

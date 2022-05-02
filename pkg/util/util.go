@@ -11,9 +11,28 @@ import (
 	"strings"
 
 	"github.com/logrusorgru/aurora"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/ssh/terminal"
 )
+
+func ConfigPath() string {
+	dir, err := os.UserConfigDir()
+	if err != nil {
+		log.Fatal().Err(err).Msg("Unable to resolve user config directory.")
+	}
+
+	return dir
+}
+
+func DataPath() string {
+	dir, err := UserDataDir()
+	if err != nil {
+		log.Fatal().Err(err).Msg("Unable to resolve user data directory.")
+	}
+
+	return dir
+}
 
 func EnsureDir(fileName string) {
 	dirName := filepath.Dir(fileName)

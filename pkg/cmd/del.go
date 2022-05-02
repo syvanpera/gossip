@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/spf13/cobra"
-	"github.com/syvanpera/gossip/util"
+	"github.com/syvanpera/gossip/pkg/util"
 )
 
 var force bool
@@ -31,7 +31,7 @@ var delCmd = &cobra.Command{
 func del(cmd *cobra.Command, args []string) {
 	id, _ := strconv.Atoi(args[0])
 
-	if err := gossipService.Delete(id, force); err != nil {
+	if err := service.Delete(id); err != nil {
 		util.PrintError(err)
 		return
 	}

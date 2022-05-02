@@ -5,9 +5,10 @@ import (
 	"regexp"
 
 	"github.com/spf13/cobra"
-	"github.com/syvanpera/gossip/meta"
-	"github.com/syvanpera/gossip/ui"
-	"github.com/syvanpera/gossip/util"
+	"github.com/syvanpera/gossip/pkg/meta"
+	"github.com/syvanpera/gossip/pkg/services/bookmarks"
+	"github.com/syvanpera/gossip/pkg/ui"
+	"github.com/syvanpera/gossip/pkg/util"
 )
 
 var tags string
@@ -48,7 +49,7 @@ func add(cmd *cobra.Command, args []string) {
 				description = meta.Description
 			}
 			if tags == "" {
-				tags = fmt.Sprintf("%s,%s", tags, meta.Tags)
+				tags = meta.Tags
 			}
 		}
 	}
@@ -59,7 +60,7 @@ func add(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	s, err := gossipService.Create(url, description, tags)
+	s, err := service.Create(bookmarks.BookmarkCreateUpdate{URL: url, Description: description, Tags: tags})
 	if err != nil {
 		util.PrintError(err)
 		return

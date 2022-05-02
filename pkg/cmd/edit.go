@@ -6,10 +6,9 @@ import (
 	"strconv"
 
 	"github.com/spf13/cobra"
-	"github.com/syvanpera/gossip/util"
 )
 
-var addTags string
+var editTags string
 
 var editCmd = &cobra.Command{
 	Use:     "edit ID [CONTENT] [DESCRIPTION]",
@@ -29,24 +28,25 @@ var editCmd = &cobra.Command{
 }
 
 func edit(_ *cobra.Command, args []string) {
-	id, _ := strconv.Atoi(args[0])
+	fmt.Println("ARGS", args, editTags)
+	// id, _ := strconv.Atoi(args[0])
 
-	if addTags == "" {
-		util.PrintError(errors.New("Tags parameter missing"))
-		return
-	}
+	// if editTags == "" {
+	// 	util.PrintError(errors.New("Tags parameter missing"))
+	// 	return
+	// }
 
-	gossip, err := gossipService.Update(id, addTags)
-	if err != nil {
-		util.PrintError(err)
-		return
-	}
+	// gossip, err := service.Update(id, editTags)
+	// if err != nil {
+	// 	util.PrintError(err)
+	// 	return
+	// }
 
-	fmt.Println(gossip.Render(false))
+	// fmt.Println(gossip.Render(false))
 }
 
 func init() {
 	rootCmd.AddCommand(editCmd)
 
-	editCmd.Flags().StringVarP(&addTags, "tags", "t", "", "tags to add")
+	editCmd.Flags().StringVarP(&editTags, "tag", "t", "", "comma separated list of tags\n+xxx adds a tag, -xxx removes a tag")
 }

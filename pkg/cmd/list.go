@@ -22,14 +22,21 @@ var tagsFilter string
 var compact bool
 
 func list() {
-	result, err := gossipService.List(tagsFilter)
+	result, err := service.GetAll()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
+	if len(result) == 0 {
+		fmt.Println("No bookmarks")
+	}
+
 	for _, r := range result {
-		fmt.Println(r.Render(compact))
+		fmt.Printf("%s\n", r.Render(compact))
+		if !compact {
+			fmt.Println()
+		}
 	}
 }
 
