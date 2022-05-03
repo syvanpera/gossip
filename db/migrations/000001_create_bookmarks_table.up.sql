@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS bookmarks(
-    id INTEGER PRIMARY KEY,
-    url TEXT UNIQUE,
-    description TEXT,
-    tags TEXT,
-    flags INTEGER,
+    id INTEGER NOT NULL PRIMARY KEY,
+    url TEXT NOT NULL UNIQUE,
+    description TEXT NOT NULL DEFAULT '',
+    tags TEXT NOT NULL DEFAULT '',
+    flags INTEGER NOT NULL DEFAULT 0,
 
-    created_at datetime,
-    updated_at datetime
+    created_at DATETIME DEFAULT (datetime('now')),
+    updated_at DATETIME DEFAULT (datetime('now'))
 );

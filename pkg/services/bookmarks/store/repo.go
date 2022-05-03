@@ -10,7 +10,7 @@ import (
 const (
 	selectBookmark      = `SELECT id, url, description, tags, flags, created_at, updated_at FROM bookmarks WHERE id=$1`
 	selectManyBookmarks = `SELECT id, url, description, tags, flags, created_at, updated_at FROM bookmarks`
-	insertBookmark      = `INSERT INTO bookmarks (url, description, tags, flags, created_at, updated_at) VALUES ($1, $2, $3, $4, datetime('now'), datetime('now')) RETURNING id`
+	insertBookmark      = `INSERT INTO bookmarks (url, description, tags, flags) VALUES ($1, $2, $3, $4) RETURNING id`
 	updateBookmark      = `UPDATE bookmarks SET url = $1, description = $2, tags = $3, flags = $4, updated_at = datetime('now') WHERE id = $5`
 	deleteBookmark      = `DELETE FROM bookmarks WHERE id = $1`
 )

@@ -61,6 +61,7 @@ func (b Bookmark) Render(compact bool) string {
 			// 	fmt.Fprintf(&output, "%s%s ", au.BrightRed("#"), au.BrightBlue(t))
 			// }
 		}
+		// fmt.Fprintf(&output, "\n   %v %v", au.BrightMagenta(b.CreatedAt.Local()), au.BrightMagenta(b.UpdatedAt.Local()))
 	}
 
 	return output.String()
