@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -21,14 +24,18 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	conn, err := db.GetConnection(viper.GetString("database.path"))
 	if err != nil {
-		log.Err(err).Msg("Database connection failed")
+		fmt.Println("Database connection failed")
+		os.Exit(1)
 	}
 	defer func() {
 		if conn != nil {
 			conn.Close()
 		}
 	}()
-	service = bookmarks.New(store.New(conn))
+
+	repo := store.New(conn)
+	repo.InitDB()
+	service = bookmarks.New(repo)
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal().Err(err).Msg("Command failed")

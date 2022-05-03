@@ -22,9 +22,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"path/filepath"
 
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 	"github.com/syvanpera/gossip/pkg/cmd"
 	"github.com/syvanpera/gossip/pkg/util"
@@ -39,7 +39,7 @@ func init() {
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
-		log.Fatal().Err(err).Msg("Unable to read config")
+		log.Fatal(err)
 	}
 
 	viper.SetDefault("config.color", true)

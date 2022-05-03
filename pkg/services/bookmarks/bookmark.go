@@ -7,6 +7,7 @@ type Repo interface {
 	Create(bcu BookmarkCreateUpdate) (int, error)
 	Update(bcu BookmarkCreateUpdate, id int) error
 	Delete(id int) error
+	InitDB()
 }
 
 // Service defines the service level contract that other services
