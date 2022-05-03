@@ -34,7 +34,16 @@ func DataPath() string {
 	return dir
 }
 
-func EnsureDir(fileName string) {
+func DataPathExists() bool {
+	dirName := filepath.Dir(DataPath())
+	if _, err := os.Stat(dirName); err != nil {
+		return false
+	}
+
+	return true
+}
+
+func EnsurePath(fileName string) {
 	dirName := filepath.Dir(fileName)
 	if _, err := os.Stat(dirName); err != nil {
 		if err = os.MkdirAll(dirName, os.ModePerm); err != nil {
