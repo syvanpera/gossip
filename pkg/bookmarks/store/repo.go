@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/rs/zerolog/log"
-	"github.com/syvanpera/gossip/pkg/services/bookmarks"
+	"github.com/syvanpera/gossip/pkg/bookmarks"
 )
 
 const (
@@ -17,11 +17,21 @@ const (
 	deleteBookmark  = `DELETE FROM bookmarks WHERE id = $1`
 )
 
+// Repo defines the DB level interaction of bookmarks
+type Repo interface {
+	Get(id int) (bookmarks.Bookmark, error)
+	GetAll(filters bookmarks.BookmarkFilters) ([]bookmarks.Bookmark, error)
+	Create(bcu bookmarks.BookmarkCreateUpdate) (int, error)
+	Update(bcu bookmarks.BookmarkCreateUpdate, id int) error
+	Delete(id int) error
+	InitDB()
+}
+
 type bookmarkRepo struct {
 	DB *sql.DB
 }
 
-func New(conn *sql.DB) bookmarks.Repo {
+func New(conn *sql.DB) Repo {
 	return &bookmarkRepo{conn}
 }
 

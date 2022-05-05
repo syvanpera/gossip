@@ -22,7 +22,7 @@ var tagFilter string
 var compact bool
 
 func list() {
-	result, err := service.Find(tagFilter)
+	result, err := bookmarksService.Find(tagFilter)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -33,7 +33,10 @@ func list() {
 	}
 
 	for _, r := range result {
-		fmt.Printf("%s\n", r.Render(compact))
+		if !compact {
+			fmt.Println()
+		}
+		fmt.Printf("%s", r.Render(compact))
 		if !compact {
 			fmt.Println()
 		}

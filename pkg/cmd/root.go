@@ -4,12 +4,12 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/syvanpera/gossip/pkg/bookmarks/service"
+	"github.com/syvanpera/gossip/pkg/bookmarks/store"
 	"github.com/syvanpera/gossip/pkg/db"
-	"github.com/syvanpera/gossip/pkg/services/bookmarks"
-	"github.com/syvanpera/gossip/pkg/services/bookmarks/store"
 )
 
-var service bookmarks.Service
+var bookmarksService service.Service
 
 var rootCmd = &cobra.Command{
 	Use:   "gossip",
@@ -22,7 +22,7 @@ func Execute() {
 	conn := db.GetConnection(viper.GetString("database.path"))
 	defer conn.Close()
 
-	service = bookmarks.New(store.New(conn))
+	bookmarksService = service.New(store.New(conn))
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal().Err(err).Msg("Command failed")

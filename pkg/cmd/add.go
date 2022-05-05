@@ -5,8 +5,8 @@ import (
 	"regexp"
 
 	"github.com/spf13/cobra"
+	"github.com/syvanpera/gossip/pkg/bookmarks"
 	"github.com/syvanpera/gossip/pkg/meta"
-	"github.com/syvanpera/gossip/pkg/services/bookmarks"
 	"github.com/syvanpera/gossip/pkg/ui"
 	"github.com/syvanpera/gossip/pkg/util"
 )
@@ -60,7 +60,7 @@ func add(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	s, err := service.Create(bookmarks.BookmarkCreateUpdate{URL: url, Description: description, Tags: tags})
+	s, err := bookmarksService.Create(bookmarks.BookmarkCreateUpdate{URL: url, Description: description, Tags: tags})
 	if err != nil {
 		util.PrintError(err)
 		return
