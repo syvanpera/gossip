@@ -14,8 +14,8 @@ var force bool
 var delCmd = &cobra.Command{
 	Use:     "del",
 	Aliases: []string{"rm", "d"},
-	Short:   "Delete a snippet",
-	Long:    `Delete a snippet`,
+	Short:   "Delete a bookmark",
+	Long:    `Delete a bookmark`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
 			return errors.New("requires an integer ID argument")

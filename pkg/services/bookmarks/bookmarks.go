@@ -1,9 +1,14 @@
 package bookmarks
 
+import (
+	"fmt"
+	"strings"
+)
+
 // Repo defines the DB level interaction of bookmarks
 type Repo interface {
 	Get(id int) (Bookmark, error)
-	GetAll() ([]Bookmark, error)
+	GetAll(filters BookmarkFilters) ([]Bookmark, error)
 	Create(bcu BookmarkCreateUpdate) (int, error)
 	Update(bcu BookmarkCreateUpdate, id int) error
 	Delete(id int) error
@@ -14,7 +19,7 @@ type Repo interface {
 // outside this package can use to interact with Bookmark resources
 type Service interface {
 	Get(id int) (Bookmark, error)
-	GetAll() ([]Bookmark, error)
+	Find(tags string) ([]Bookmark, error)
 	Create(bcu BookmarkCreateUpdate) (Bookmark, error)
 	Update(bcu BookmarkCreateUpdate, id int) (Bookmark, error)
 	Delete(id int) error
@@ -32,8 +37,21 @@ func (s *bookmark) Get(id int) (Bookmark, error) {
 	return s.repo.Get(id)
 }
 
-func (s *bookmark) GetAll() ([]Bookmark, error) {
-	return s.repo.GetAll()
+func (s *bookmark) Find(tags string) ([]Bookmark, error) {
+	var tagFilters []string
+
+	if tags != "" {
+		tags := strings.Split(tags, ",")
+		for _, tag := range tags {
+			tagFilters = append(tagFilters, fmt.Sprintf("',' || tags || ',' like '%%,%s,%%'", tag))
+		}
+	}
+
+	filters := BookmarkFilters{
+		Tags: tagFilters,
+	}
+
+	return s.repo.GetAll(filters)
 }
 
 func (s *bookmark) Create(bcu BookmarkCreateUpdate) (Bookmark, error) {

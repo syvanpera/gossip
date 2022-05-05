@@ -6,6 +6,7 @@ import (
 	"os"
 
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/spf13/viper"
 	"github.com/syvanpera/gossip/pkg/util"
 )
 
@@ -25,7 +26,7 @@ CREATE TABLE IF NOT EXISTS bookmarks(
 
 func GetConnection(path string) *sql.DB {
 	firstRun := false
-	if !util.DataPathExists() {
+	if !util.PathExists(viper.GetString("database.path")) {
 		util.EnsurePath(path)
 		firstRun = true
 	}

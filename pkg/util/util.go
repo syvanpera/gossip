@@ -34,9 +34,8 @@ func DataPath() string {
 	return dir
 }
 
-func DataPathExists() bool {
-	dirName := filepath.Dir(DataPath())
-	if _, err := os.Stat(dirName); err != nil {
+func PathExists(path string) bool {
+	if _, err := os.Stat(path); err != nil {
 		return false
 	}
 

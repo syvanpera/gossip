@@ -2,17 +2,19 @@ package store
 
 import (
 	"database/sql"
+	"fmt"
+	"strings"
 
 	"github.com/rs/zerolog/log"
 	"github.com/syvanpera/gossip/pkg/services/bookmarks"
 )
 
 const (
-	selectBookmark      = `SELECT id, url, description, tags, flags, created_at, updated_at FROM bookmarks WHERE id=$1`
-	selectManyBookmarks = `SELECT id, url, description, tags, flags, created_at, updated_at FROM bookmarks`
-	insertBookmark      = `INSERT INTO bookmarks (url, description, tags, flags) VALUES ($1, $2, $3, $4) RETURNING id`
-	updateBookmark      = `UPDATE bookmarks SET url = $1, description = $2, tags = $3, flags = $4, updated_at = datetime('now') WHERE id = $5`
-	deleteBookmark      = `DELETE FROM bookmarks WHERE id = $1`
+	selectBookmark  = `SELECT id, url, description, tags, flags, created_at, updated_at FROM bookmarks WHERE id=$1`
+	selectBookmarks = `SELECT id, url, description, tags, flags, created_at, updated_at FROM bookmarks WHERE `
+	insertBookmark  = `INSERT INTO bookmarks (url, description, tags, flags) VALUES ($1, $2, $3, $4) RETURNING id`
+	updateBookmark  = `UPDATE bookmarks SET url = $1, description = $2, tags = $3, flags = $4, updated_at = datetime('now') WHERE id = $5`
+	deleteBookmark  = `DELETE FROM bookmarks WHERE id = $1`
 )
 
 type bookmarkRepo struct {
@@ -36,10 +38,15 @@ func (r *bookmarkRepo) Get(id int) (bookmarks.Bookmark, error) {
 	return bm, nil
 }
 
-func (r *bookmarkRepo) GetAll() ([]bookmarks.Bookmark, error) {
+func (r *bookmarkRepo) GetAll(filters bookmarks.BookmarkFilters) ([]bookmarks.Bookmark, error) {
 	bl := make([]bookmarks.Bookmark, 0)
 
-	rows, err := r.DB.Query(selectManyBookmarks)
+	where := "1 = 1"
+	if len(filters.Tags) > 0 {
+		where = strings.Join(filters.Tags, " AND ")
+	}
+
+	rows, err := r.DB.Query(fmt.Sprintf("%s%s", selectBookmarks, where))
 	if err != nil {
 		log.Err(err).Msg("Getting bookmarks failed")
 		return bl, bookmarks.ErrBookmarkQuery

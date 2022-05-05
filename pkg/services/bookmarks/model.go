@@ -34,6 +34,10 @@ type BookmarkCreateUpdate struct {
 	Flags       int    `json:"flags"`
 }
 
+type BookmarkFilters struct {
+	Tags []string
+}
+
 func (b Bookmark) DisplayText(plural bool) string {
 	if plural {
 		return "bookmarks"
