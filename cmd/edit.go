@@ -4,6 +4,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/syvanpera/gossip/config"
 	"github.com/syvanpera/gossip/internal/fetcher"
@@ -26,6 +27,28 @@ var editCmd = &cobra.Command{
 	Use:   "edit [id]",
 	Short: "Edit an existing bookmark's title, url, tags, or comment",
 	Args:  cobra.ExactArgs(1),
+	// Dynamic TAB completion for the ID
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) != 0 {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		storagePath := config.GetStoragePath()
+		bookmarks, err := storage.Load(storagePath)
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveError
+		}
+
+		var completions []string
+		for _, b := range bookmarks {
+			if strings.HasPrefix(b.ID, toComplete) {
+				completion := fmt.Sprintf("%s\t%s", b.ID, b.Title)
+				completions = append(completions, completion)
+			}
+		}
+
+		return completions, cobra.ShellCompDirectiveNoFileComp
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		id := args[0]
 		storagePath := config.GetStoragePath()
