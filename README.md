@@ -1,6 +1,6 @@
 <div align="center">
-
-<img src="./docs/gossip-logo.png" alt="gossiplogo" width="400" height="400"/>
+    <img src="./docs/gossip-logo.png" alt="gossiplogo" width="400" height="400" />
+</div>
 
 # gossip - A Command Line Bookmark Manager
 
