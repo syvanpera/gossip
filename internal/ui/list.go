@@ -15,24 +15,29 @@ func PrintBookmarks(bookmarks []storage.Bookmark) {
 		return
 	}
 
-	fmt.Println() // Add a blank line at the start
-
 	for _, b := range bookmarks {
-		// Format the tags like [tag1, tag2]
-		tagStr := ""
+		// Line 1: ID. Title
+		// Appends a period to the ID to match the numbered list style
+		idStr := StyleID.Render(fmt.Sprintf("%s.", b.ID))
+		fmt.Printf("%s %s\n", idStr, StyleTitle.Render(b.Title))
+
+		// Line 2:   > URL
+		// Using the existing red StyleFailed for the prefix to match the image's accent color
+		prefixURL := StyleFailed.Render("  >")
+		fmt.Printf("%s %s\n", prefixURL, StyleURL.Render(b.URL))
+
+		// Line 3:   # tag1,tag2,tag3 (if any exist)
 		if len(b.Tags) > 0 {
-			tagStr = StyleTags.Render(fmt.Sprintf("[%s]", strings.Join(b.Tags, ", ")))
+			prefixTags := StyleFailed.Render("  #")
+			// Join tags with a comma and no spaces to match the screenshot
+			tagsStr := StyleTags.Render(strings.Join(b.Tags, ","))
+			fmt.Printf("%s %s\n", prefixTags, tagsStr)
 		}
 
-		// Print the ID and Title
-		fmt.Printf("%s %s %s\n", StyleID.Render(b.ID), StyleTitle.Render(b.Title), tagStr)
-
-		// Print the URL
-		fmt.Printf("  %s\n", StyleURL.Render(b.URL))
-
-		// Print the comment/description if it exists
+		// Line 4:   // comment (if it exists, so we don't lose description data)
 		if b.Comment != "" {
-			fmt.Printf("  %s\n", StyleComment.Render(b.Comment))
+			prefixComment := StyleID.Render("  //")
+			fmt.Printf("%s %s\n", prefixComment, StyleComment.Render(b.Comment))
 		}
 
 		fmt.Println() // Add a blank line between entries
