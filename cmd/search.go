@@ -35,7 +35,7 @@ var searchCmd = &cobra.Command{
 
 		// Print a nice header, then the results
 		fmt.Printf("%s Found %d result(s) for '%s':\n\n", ui.StyleSuccess.Render("✓"), len(results), ui.StyleTitle.Render(query))
-		ui.PrintBookmarks(results)
+		ui.PrintSearchResults(results, query)
 	},
 }
 

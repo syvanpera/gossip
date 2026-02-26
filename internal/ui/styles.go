@@ -15,4 +15,7 @@ var (
 	StyleURL     = lipgloss.NewStyle().Foreground(lipgloss.Color("39")).Underline(true) // Blue
 	StyleTags    = lipgloss.NewStyle().Foreground(lipgloss.Color("214")).Italic(true)   // Orange
 	StyleComment = lipgloss.NewStyle().Foreground(lipgloss.Color("243"))                // Medium Gray
+
+	// Search matches
+	StyleHighlight = lipgloss.NewStyle().Background(lipgloss.Color("226")).Foreground(lipgloss.Color("232")).Bold(true)
 )

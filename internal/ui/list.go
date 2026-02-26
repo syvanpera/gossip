@@ -3,8 +3,10 @@ package ui
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
+	"github.com/charmbracelet/lipgloss"
 	"github.com/syvanpera/gossip/internal/storage"
 )
 
@@ -42,4 +44,84 @@ func PrintBookmarks(bookmarks []storage.Bookmark) {
 
 		fmt.Println() // Add a blank line between entries
 	}
+}
+
+// PrintSearchResults highlights the search query in the output
+func PrintSearchResults(bookmarks []storage.Bookmark, query string) {
+	if len(bookmarks) == 0 {
+		return
+	}
+
+	for _, b := range bookmarks {
+		// Highlight title
+		idStr := StyleID.Render(fmt.Sprintf("%s.", b.ID))
+		titleStr := highlightMatch(b.Title, query, StyleTitle)
+		fmt.Printf("%s %s\n", idStr, titleStr)
+
+		// Highlight URL
+		prefixURL := StyleFailed.Render("  >")
+		urlStr := highlightMatch(b.URL, query, StyleURL)
+		fmt.Printf("%s %s\n", prefixURL, urlStr)
+
+		// Highlight Tags
+		if len(b.Tags) > 0 {
+			prefixTags := StyleFailed.Render("  #")
+
+			var highlightedTags []string
+			for _, tag := range b.Tags {
+				highlightedTags = append(highlightedTags, highlightMatch(tag, query, StyleTags))
+			}
+
+			// Join tags, ensuring the commas get the default tag style
+			tagsStr := strings.Join(highlightedTags, StyleTags.Render(","))
+			fmt.Printf("%s %s\n", prefixTags, tagsStr)
+		}
+
+		// Highlight Comment
+		if b.Comment != "" {
+			prefixComment := StyleID.Render("  //")
+			commentStr := highlightMatch(b.Comment, query, StyleComment)
+			fmt.Printf("%s %s\n", prefixComment, commentStr)
+		}
+
+		fmt.Println()
+	}
+}
+
+// highlightMatch applies the base style, but highlights the matching query safely
+func highlightMatch(text, query string, baseStyle lipgloss.Style) string {
+	if query == "" {
+		return baseStyle.Render(text)
+	}
+
+	// Create a case-insensitive regex for the exact query
+	re := regexp.MustCompile(`(?i)(` + regexp.QuoteMeta(query) + `)`)
+	indices := re.FindAllStringIndex(text, -1)
+
+	if len(indices) == 0 {
+		return baseStyle.Render(text) // No match, just render normally
+	}
+
+	var result strings.Builder
+	lastIdx := 0
+
+	for _, match := range indices {
+		start, end := match[0], match[1]
+
+		// Add unstyled text before the match (styled with baseStyle)
+		if start > lastIdx {
+			result.WriteString(baseStyle.Render(text[lastIdx:start]))
+		}
+
+		// Add matched text (styled with highlightStyle)
+		result.WriteString(StyleHighlight.Render(text[start:end]))
+		lastIdx = end
+	}
+
+	// Add any remaining text after the final match
+	if lastIdx < len(text) {
+		result.WriteString(baseStyle.Render(text[lastIdx:]))
+	}
+
+	return result.String()
 }
