@@ -62,12 +62,12 @@ var editCmd = &cobra.Command{
 
 		// 2. Handle Refetching FIRST
 		if refetchTags || refetchAll {
-			fmt.Printf("%s Fetching metadata for '%s'...\n", ui.StyleRunning.Render("Working..."), ui.StyleURL.Render(bm.URL))
+			fmt.Printf("\n%s Fetching metadata for '%s'...\n", ui.StyleRunning.Render("Working..."), ui.StyleURL.Render(bm.URL))
 
 			f := fetcher.GetFetcher(bm.URL)
 			meta, err := f.Fetch(bm.URL)
 			if err != nil {
-				fmt.Printf("%s Failed to fetch metadata: %v\n", ui.StyleFailed.Render("✗"), err)
+				fmt.Printf("\n%s Failed to fetch metadata: %v\n", ui.StyleFailed.Render("✗"), err)
 				os.Exit(1)
 			}
 
@@ -87,7 +87,7 @@ var editCmd = &cobra.Command{
 					bm.Tags = meta.Tags
 					fmt.Printf("%s Refetched tags successfully!\n", ui.StyleSuccess.Render("✓"))
 				} else {
-					fmt.Printf("%s No default tags found on the target URL.\n", ui.StyleComment.Render("-"))
+					fmt.Printf("\n%s No default tags found on the target URL.\n", ui.StyleComment.Render("-"))
 				}
 			}
 		}
