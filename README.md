@@ -2,7 +2,7 @@
 
 <img src="./docs/gossip-logo.png" alt="gossiplogo" width="400" height="400"/>
 
-# gossip - The Beautiful Command Line Bookmark Manager
+# gossip - A Command Line Bookmark Manager
 
 `gossip` is a fast, lightweight, and gorgeous command-line bookmark manager written in Go.
 It allows you to save, tag, search, and open links entirely from your terminal. 
