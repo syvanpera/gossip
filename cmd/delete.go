@@ -14,9 +14,10 @@ import (
 )
 
 var deleteCmd = &cobra.Command{
-	Use:   "delete [id]",
-	Short: "Delete a bookmark by its ID",
-	Args:  cobra.ExactArgs(1),
+	Use:     "delete [id]",
+	Short:   "Delete a bookmark by its ID",
+	Args:    cobra.ExactArgs(1),
+	Aliases: []string{"del", "rm", "remove"},
 	// This function powers the dynamic TAB completion
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		// We only want to autocomplete the first argument (the ID)
