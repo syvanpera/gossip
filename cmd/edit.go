@@ -1,70 +1,130 @@
+// cmd/edit.go
 package cmd
 
 import (
-	"errors"
 	"fmt"
-	"strconv"
+	"os"
 	"strings"
 
+	"github.com/syvanpera/gossip/config"
+	"github.com/syvanpera/gossip/internal/fetcher"
+	"github.com/syvanpera/gossip/internal/storage"
+	"github.com/syvanpera/gossip/internal/ui"
+
 	"github.com/spf13/cobra"
-	"github.com/syvanpera/gossip/snippet"
-	"github.com/syvanpera/gossip/util"
 )
 
-var addTags string
+var (
+	editTitle   string
+	editURL     string
+	editComment string
+	editTags    []string
+	refetchTags bool
+	refetchAll  bool
+)
 
 var editCmd = &cobra.Command{
-	Use:     "edit ID [CONTENT] [DESCRIPTION]",
-	Aliases: []string{"ed", "e"},
-	Short:   "Edit a snippet",
-	Long:    `Edit a snippet"`,
-	Args: func(cmd *cobra.Command, args []string) error {
-		if len(args) < 1 {
-			return errors.New("requires an integer ID argument")
+	Use:   "edit [id]",
+	Short: "Edit an existing bookmark's title, url, tags, or comment",
+	Args:  cobra.ExactArgs(1),
+	// Dynamic TAB completion for the ID
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) != 0 {
+			return nil, cobra.ShellCompDirectiveNoFileComp
 		}
-		if _, err := strconv.Atoi(args[0]); err == nil {
-			return nil
+
+		storagePath := config.GetStoragePath()
+		bookmarks, err := storage.Load(storagePath)
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveError
 		}
-		return fmt.Errorf("invalid ID number specified: %s", args[0])
+
+		var completions []string
+		for _, b := range bookmarks {
+			if strings.HasPrefix(b.ID, toComplete) {
+				completion := fmt.Sprintf("%s\t%s", b.ID, b.Title)
+				completions = append(completions, completion)
+			}
+		}
+
+		return completions, cobra.ShellCompDirectiveNoFileComp
 	},
-	Run: edit,
-}
+	Run: func(cmd *cobra.Command, args []string) {
+		id := args[0]
+		storagePath := config.GetStoragePath()
 
-func edit(_ *cobra.Command, args []string) {
-	id, _ := strconv.Atoi(args[0])
-	r := snippet.NewRepository()
-
-	s := r.Get(id)
-	if s == nil {
-		fmt.Printf("Snippet with ID %d not found\n", id)
-		return
-	}
-
-	if addTags == "" {
-		if err := s.Edit(); err != nil {
-			fmt.Println("Canceled")
-			return
+		// 1. Fetch the existing bookmark
+		bm, err := storage.GetByID(storagePath, id)
+		if err != nil {
+			fmt.Printf("%s %v\n", ui.StyleFailed.Render("✗ Error:"), err)
+			os.Exit(1)
 		}
-	}
 
-	existingTags := strings.Split(s.Data().Tags, ",")
-	tags := strings.Split(addTags, ",")
-	newTags := existingTags
+		// 2. Handle Refetching FIRST
+		if refetchTags || refetchAll {
+			fmt.Printf("%s Fetching metadata for '%s'...\n", ui.StyleRunning.Render("Working..."), ui.StyleURL.Render(bm.URL))
 
-	for _, t := range tags {
-		tag := strings.ToLower(t)
-		if !util.Contains(existingTags, tag) {
-			newTags = append(newTags, tag)
+			f := fetcher.GetFetcher(bm.URL)
+			meta, err := f.Fetch(bm.URL)
+			if err != nil {
+				fmt.Printf("%s Failed to fetch metadata: %v\n", ui.StyleFailed.Render("✗"), err)
+				os.Exit(1)
+			}
+
+			if refetchAll {
+				if meta.Title != "" {
+					bm.Title = meta.Title
+				}
+				if meta.Description != "" {
+					bm.Comment = meta.Description
+				}
+				if len(meta.Tags) > 0 {
+					bm.Tags = meta.Tags
+				}
+				fmt.Printf("%s Refetched all metadata successfully!\n", ui.StyleSuccess.Render("✓"))
+			} else if refetchTags {
+				if len(meta.Tags) > 0 {
+					bm.Tags = meta.Tags
+					fmt.Printf("%s Refetched tags successfully!\n", ui.StyleSuccess.Render("✓"))
+				} else {
+					fmt.Printf("%s No default tags found on the target URL.\n", ui.StyleComment.Render("-"))
+				}
+			}
 		}
-	}
-	s.Data().Tags = strings.Trim(strings.Join(newTags, ","), " ,")
-	r.Save(s)
 
-	fmt.Println(s)
+		// 3. Apply manual updates (These safely override the refetched data)
+		if cmd.Flags().Changed("title") {
+			bm.Title = editTitle
+		}
+		if cmd.Flags().Changed("url") {
+			bm.URL = editURL
+		}
+		if cmd.Flags().Changed("comment") {
+			bm.Comment = editComment
+		}
+		if cmd.Flags().Changed("tags") {
+			bm.Tags = editTags
+		}
+
+		// 4. Save the updated bookmark back to storage
+		err = storage.Update(storagePath, bm)
+		if err != nil {
+			fmt.Printf("%s Failed to update: %v\n", ui.StyleFailed.Render("✖"), err)
+			os.Exit(1)
+		}
+
+		fmt.Printf("%s Bookmark '%s' updated successfully!\n", ui.StyleSuccess.Render("✓ Success!"), ui.StyleID.Render(id))
+	},
 }
 
 func init() {
 	rootCmd.AddCommand(editCmd)
 
-	editCmd.Flags().StringVarP(&addTags, "tags", "t", "", "tags to add")
+	editCmd.Flags().StringVarP(&editTitle, "title", "T", "", "Update the title")
+	editCmd.Flags().StringVarP(&editURL, "url", "u", "", "Update the URL")
+	editCmd.Flags().StringVarP(&editComment, "comment", "c", "", "Update the comment")
+	editCmd.Flags().StringSliceVarP(&editTags, "tags", "t", []string{}, "Update tags (comma-separated)")
+
+	editCmd.Flags().BoolVar(&refetchTags, "refetch-tags", false, "Refetch default tags from the URL")
+	editCmd.Flags().BoolVar(&refetchAll, "refetch-all", false, "Refetch all metadata (title, comment, tags) from the URL") // Register new flag
 }
