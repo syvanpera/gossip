@@ -13,7 +13,7 @@ import (
 // PrintBookmarks iterates through the bookmarks and prints them with Lip Gloss styles
 func PrintBookmarks(bookmarks []storage.Bookmark) {
 	if len(bookmarks) == 0 {
-		fmt.Println(StyleTitle.Render("No bookmarks found. Try adding one!"))
+		fmt.Println(StyleTitle.Render("\nNo bookmarks found. Try adding one!"))
 		return
 	}
 

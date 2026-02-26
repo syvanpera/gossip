@@ -83,7 +83,7 @@ func (m AddModel) View() string {
 		return fmt.Sprintf("%s %s\n", StyleFailed.Render("✗ Failed:"), m.err.Error())
 	}
 	if m.done {
-		return fmt.Sprintf("%s Added %s\n", StyleSuccess.Render("✓ Success!"), StyleTitle.Render(m.title))
+		return fmt.Sprintf("\n%s Added %s\n", StyleSuccess.Render("✓ Success!"), StyleTitle.Render(m.title))
 	}
 
 	// While running, show the spinner and the "Working..." text
