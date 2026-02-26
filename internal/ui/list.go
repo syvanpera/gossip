@@ -17,6 +17,8 @@ func PrintBookmarks(bookmarks []storage.Bookmark) {
 		return
 	}
 
+	fmt.Println() // Add a blank line before the list for better spacing
+
 	for _, b := range bookmarks {
 		// Line 1: ID. Title
 		// Appends a period to the ID to match the numbered list style
